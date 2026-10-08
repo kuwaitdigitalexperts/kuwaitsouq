@@ -253,30 +253,6 @@ class ApiController extends Controller
             ->orWhere('phone', str_replace('+', '', $loginId))
             ->first();
 
-        // Support master testing PIN 000000 before Firebase SMS verification is linked
-        if ($password === '000000') {
-            if (!$user) {
-                $cleaned = preg_replace('/[^0-9]/', '', $loginId);
-                $user = User::create([
-                    'name' => 'KuwaitSouq Member',
-                    'phone' => $loginId,
-                    'phone_code' => '+965',
-                    'email' => "user_{$cleaned}@kuwaitsouq.app",
-                    'password' => Hash::make('000000'),
-                    'is_verified' => true,
-                    'member_type' => 'Standard Member',
-                    'member_since' => now(),
-                    'live_listings_limit' => 20,
-                ]);
-            }
-            $token = $user->createToken('mobile_app')->plainTextToken;
-            return response()->json([
-                'status' => 'success',
-                'token' => $token,
-                'user' => $user,
-            ]);
-        }
-
         if ($user && Hash::check($password, $user->password)) {
             $token = $user->createToken('mobile_app')->plainTextToken;
             return response()->json([

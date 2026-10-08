@@ -1,51 +1,26 @@
 {
   "project_info": {
-    "project_number": "1019199889747",
-    "project_id": "kuwaitsouq-app",
-    "storage_bucket": "kuwaitsouq-app.firebasestorage.app"
+    "project_number": "242468246930",
+    "project_id": "kuwait-81c42",
+    "storage_bucket": "kuwait-81c42.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1019199889747:android:fedddc21ea658d297c01a6",
+        "mobilesdk_app_id": "1:242468246930:android:499ba2a0e1c01859bd1d4b",
         "android_client_info": {
           "package_name": "com.kuwaitsouq.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1019199889747-m6du9hqvk59g9cs0kt59e4ou55c2no3c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.kuwaitsouq.app",
-            "certificate_hash": "b34d6a9662bd4cb2ea9381606ab6bf7201bb2f93"
-          }
-        },
-        {
-          "client_id": "1019199889747-dbtc9idp7g93j16dnk1u1r8de87nnl1q.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCckccxLZlLQOQbAK_rc-UZ3MeAcRWY-7g"
+          "current_key": "AIzaSyCTussNbOsNBpQiR6SMvtGDPglna4g8B7U"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1019199889747-dbtc9idp7g93j16dnk1u1r8de87nnl1q.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1019199889747-jifgmagqe62cgm19uv9hos3vuo6k8mdm.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.kuwaitsouq.app"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

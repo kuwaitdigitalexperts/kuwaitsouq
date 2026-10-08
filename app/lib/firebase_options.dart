@@ -41,51 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCr2_pBthNm1SaBonugXQsiRkOwboUbL_s',
-    appId: '1:1019199889747:web:ad8523b2cfe4d0867c01a6',
-    messagingSenderId: '1019199889747',
-    projectId: 'kuwaitsouq-app',
-    authDomain: 'kuwaitsouq-app.firebaseapp.com',
-    storageBucket: 'kuwaitsouq-app.firebasestorage.app',
-    measurementId: 'G-0GD9B8X2LY',
+    apiKey: 'AIzaSyA0WZH_LEG-cDWwon7BKsDucKAYqQ61b0U',
+    appId: '1:242468246930:web:7369142951e8207fbd1d4b',
+    messagingSenderId: '242468246930',
+    projectId: 'kuwait-81c42',
+    authDomain: 'kuwait-81c42.firebaseapp.com',
+    storageBucket: 'kuwait-81c42.firebasestorage.app',
+    measurementId: 'G-HBKZH9VGPR',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCckccxLZlLQOQbAK_rc-UZ3MeAcRWY-7g',
-    appId: '1:1019199889747:android:fedddc21ea658d297c01a6',
-    messagingSenderId: '1019199889747',
-    projectId: 'kuwaitsouq-app',
-    storageBucket: 'kuwaitsouq-app.firebasestorage.app',
+    apiKey: 'AIzaSyCTussNbOsNBpQiR6SMvtGDPglna4g8B7U',
+    appId: '1:242468246930:android:499ba2a0e1c01859bd1d4b',
+    messagingSenderId: '242468246930',
+    projectId: 'kuwait-81c42',
+    storageBucket: 'kuwait-81c42.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBfzY3SzPcUgAnPiXkrPxmFtqXo-u8tQs8',
-    appId: '1:1019199889747:ios:d29b8326b5eb36db7c01a6',
-    messagingSenderId: '1019199889747',
-    projectId: 'kuwaitsouq-app',
-    storageBucket: 'kuwaitsouq-app.firebasestorage.app',
-    androidClientId: '1019199889747-m6du9hqvk59g9cs0kt59e4ou55c2no3c.apps.googleusercontent.com',
-    iosClientId: '1019199889747-3ldj67t439gk5lpmjuep70teletqpvb0.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDb5hH414XZGmLE651gl41-K5SK6_HswVM',
+    appId: '1:242468246930:ios:f49448db6128bc4ebd1d4b',
+    messagingSenderId: '242468246930',
+    projectId: 'kuwait-81c42',
+    storageBucket: 'kuwait-81c42.firebasestorage.app',
     iosBundleId: 'com.kuwaitsouq.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBfzY3SzPcUgAnPiXkrPxmFtqXo-u8tQs8',
-    appId: '1:1019199889747:ios:47d467337f86aab97c01a6',
-    messagingSenderId: '1019199889747',
-    projectId: 'kuwaitsouq-app',
-    storageBucket: 'kuwaitsouq-app.firebasestorage.app',
-    iosClientId: '1019199889747-jifgmagqe62cgm19uv9hos3vuo6k8mdm.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDb5hH414XZGmLE651gl41-K5SK6_HswVM',
+    appId: '1:242468246930:ios:f49448db6128bc4ebd1d4b',
+    messagingSenderId: '242468246930',
+    projectId: 'kuwait-81c42',
+    storageBucket: 'kuwait-81c42.firebasestorage.app',
     iosBundleId: 'com.kuwaitsouq.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCr2_pBthNm1SaBonugXQsiRkOwboUbL_s',
-    appId: '1:1019199889747:web:bdeb71198400032f7c01a6',
-    messagingSenderId: '1019199889747',
-    projectId: 'kuwaitsouq-app',
-    authDomain: 'kuwaitsouq-app.firebaseapp.com',
-    storageBucket: 'kuwaitsouq-app.firebasestorage.app',
-    measurementId: 'G-2ZSMWNS9Q5',
+    apiKey: 'AIzaSyA0WZH_LEG-cDWwon7BKsDucKAYqQ61b0U',
+    appId: '1:242468246930:web:7f5ecc945f30e153bd1d4b',
+    messagingSenderId: '242468246930',
+    projectId: 'kuwait-81c42',
+    authDomain: 'kuwait-81c42.firebaseapp.com',
+    storageBucket: 'kuwait-81c42.firebasestorage.app',
+    measurementId: 'G-QRZ9NCTM2G',
   );
+
 }

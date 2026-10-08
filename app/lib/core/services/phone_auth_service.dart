@@ -57,9 +57,8 @@ class PhoneAuthService {
         },
         verificationFailed: (FirebaseAuthException e) {
           debugPrint('PhoneAuth: verificationFailed code=${e.code} message=${e.message}');
-          // If Firebase is not yet connected or has quota/credential issue, enable bypass PIN 000000
-          debugPrint('PhoneAuth: Falling back to bypass PIN (000000)');
-          onCodeSent('test_session_000000', null);
+          final message = _parseFirebasePhoneError(e);
+          onFailed(message);
         },
         codeSent: (String verificationId, int? resendToken) {
           debugPrint('PhoneAuth: Code sent successfully. verificationId=$verificationId');
@@ -70,9 +69,8 @@ class PhoneAuthService {
         },
       );
     } catch (e) {
-      debugPrint('Firebase verifyPhoneNumber unavailable or failed: $e. Falling back to PIN 000000.');
-      // Graceful fallback when Firebase is not connected yet
-      onCodeSent('test_session_000000', null);
+      debugPrint('Unexpected error calling verifyPhoneNumber: $e');
+      onFailed('Failed to send verification SMS: $e');
     }
   }
 
@@ -82,15 +80,6 @@ class PhoneAuthService {
     required String smsCode,
   }) async {
     final cleanCode = smsCode.trim();
-
-    // Support 000000 as universal testing PIN prior to Firebase SMS setup
-    if (cleanCode == '000000') {
-      debugPrint('PhoneAuth: Master PIN 000000 accepted successfully.');
-      return PhoneAuthVerificationResult(
-        isSuccess: true,
-        user: null,
-      );
-    }
 
     try {
       final auth = await _getAuth();

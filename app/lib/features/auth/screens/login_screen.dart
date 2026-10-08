@@ -158,32 +158,23 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         onFailed: (errorMessage) {
           if (!mounted) return;
-          // Graceful fallback to PIN mode if Firebase is not connected yet
-          setState(() {
-            _verificationId = 'test_session_000000';
-            _isOtpSent = true;
-            _isLocalLoading = false;
-          });
+          setState(() => _isLocalLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: AppTheme.primaryBlue,
-              content: Text('Testing Mode: Enter PIN 000000 to sign in'),
-              duration: Duration(seconds: 4),
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text(errorMessage),
+              duration: const Duration(seconds: 4),
             ),
           );
         },
       );
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _verificationId = 'test_session_000000';
-          _isOtpSent = true;
-          _isLocalLoading = false;
-        });
+        setState(() => _isLocalLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: AppTheme.primaryBlue,
-            content: Text('Testing Mode: Enter PIN 000000 to sign in'),
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text('Could not send verification code: $e'),
           ),
         );
       }
@@ -196,69 +187,25 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text('Please enter 6-digit PIN (use 000000)'),
+          content: Text('Please enter the 6-digit OTP received via SMS'),
         ),
       );
       return;
-    }
-
-    final rawPhone = _phoneController.text.trim();
-    final fullPhoneNumber = '${_selectedCountry.dialCode}$rawPhone';
-    setState(() => _isLocalLoading = true);
-
-    // Direct support for 000000 master PIN before Firebase is connected
-    if (otp == '000000' || _verificationId == 'test_session_000000') {
-      try {
-        final auth = context.read<AuthProvider>();
-        final ok = await auth.loginWithPhone(
-          phoneNumber: fullPhoneNumber,
-          uid: 'phone_$rawPhone',
-        );
-
-        if (!mounted) return;
-        setState(() => _isLocalLoading = false);
-
-        if (ok) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: AppTheme.primaryGreen,
-              content: Text('Mobile verified successfully! Welcome to KuwaitSouq.'),
-            ),
-          );
-          _navigateAfterAuth();
-          return;
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(auth.error ?? 'Authentication sync failed.'),
-            ),
-          );
-          return;
-        }
-      } catch (err) {
-        if (!mounted) return;
-        setState(() => _isLocalLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text('Login error: $err'),
-          ),
-        );
-        return;
-      }
     }
 
     if (_verificationId == null) {
-      setState(() => _isLocalLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text('Verification session expired. Please request a new OTP or use PIN 000000.'),
+          content: Text('Verification session expired. Please request a new OTP.'),
         ),
       );
       return;
     }
+
+    setState(() => _isLocalLoading = true);
+    final rawPhone = _phoneController.text.trim();
+    final fullPhoneNumber = '${_selectedCountry.dialCode}$rawPhone';
 
     try {
       final verifyResult = await PhoneAuthService.verifySmsCode(
@@ -304,16 +251,15 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLocalLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text('Verification error: $e'),
-          ),
-        );
-      }
+    } catch (err) {
+      if (!mounted) return;
+      setState(() => _isLocalLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text('Verification error: $err'),
+        ),
+      );
     }
   }
 
@@ -871,63 +817,32 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildOtpInputField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceWhite,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppTheme.borderLight, width: 1.2),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TextFormField(
-            controller: _otpController,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 10,
-              color: AppTheme.primaryBlue,
-            ),
-            decoration: const InputDecoration(
-              hintText: '000000',
-              hintStyle: TextStyle(letterSpacing: 10, color: Color(0xFF94A3B8), fontSize: 22),
-              counterText: '',
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 14),
-            ),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.borderLight, width: 1.2),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: TextFormField(
+        controller: _otpController,
+        keyboardType: TextInputType.number,
+        maxLength: 6,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 10,
+          color: AppTheme.primaryBlue,
         ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFEFF6FF),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFBFDBFE)),
-          ),
-          child: Row(
-            children: const [
-              Icon(Icons.vpn_key_rounded, size: 16, color: Color(0xFF2563EB)),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'رمز التحقق التجريبي الحالي: 000000\n(Test PIN: 000000)',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E40AF),
-                    height: 1.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        decoration: const InputDecoration(
+          hintText: '• • • • • •',
+          hintStyle: TextStyle(letterSpacing: 10, color: AppTheme.textMuted, fontSize: 24),
+          counterText: '',
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
-      ],
+      ),
     );
   }
 

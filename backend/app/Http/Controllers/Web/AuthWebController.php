@@ -31,27 +31,6 @@ class AuthWebController extends Controller
             ->orWhere('phone', preg_replace('/[^0-9]/', '', $loginInput))
             ->first();
 
-        // Allow 000000 master PIN for testing
-        if ($request->password === '000000') {
-            if (!$user) {
-                $cleaned = preg_replace('/[^0-9]/', '', $loginInput);
-                $user = User::create([
-                    'name' => 'KuwaitSouq Member',
-                    'phone' => $loginInput,
-                    'phone_code' => '+965',
-                    'email' => "user_{$cleaned}@kuwaitsouq.app",
-                    'password' => Hash::make('000000'),
-                    'is_verified' => true,
-                    'member_type' => 'Standard Member',
-                    'member_since' => now(),
-                    'live_listings_limit' => 20,
-                ]);
-            }
-            Auth::login($user, $request->boolean('remember'));
-            $request->session()->regenerate();
-            return redirect()->intended(route('account'))->with('success', 'Logged in successfully with master PIN (000000).');
-        }
-
         if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
