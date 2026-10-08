@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <linearGradient id="ksIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="50%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="ksIconAccent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#ksIconGrad)" filter="url(#softShadow)"/>
+
+  <!-- Foreground emblem in white -->
+  <g transform="translate(4, -2)">
+    <!-- Shopping Bag Body -->
+    <path d="M26 48 L94 48 L106 110 C106 113 103 115 100 115 L20 115 C17 115 14 113 14 110 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+    
+    <!-- Bag Handle -->
+    <path d="M44 48 C44 26 76 26 76 48" 
+          fill="none" stroke="#34D399" stroke-width="4.5" stroke-linecap="round"/>
+
+    <!-- Center Main Tower -->
+    <line x1="60" y1="115" x2="60" y2="52" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="86" r="10.5" fill="#FFFFFF"/>
+    <circle cx="60" cy="65" r="7" fill="#FFFFFF"/>
+    <polygon points="60,44 57.5,52 62.5,52" fill="#FFFFFF"/>
+
+    <!-- Left Secondary Tower -->
+    <line x1="40" y1="115" x2="40" y2="68" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="40" cy="94" r="8" fill="#FFFFFF"/>
+    <polygon points="40,61 38,68 42,68" fill="#FFFFFF"/>
+
+    <!-- Right Needle Tower -->
+    <line x1="80" y1="115" x2="80" y2="74" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="80,67 78.5,74 81.5,74" fill="#34D399"/>
+  </g>
+</svg>

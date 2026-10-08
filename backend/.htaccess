@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent direct access to sensitive files
+    <FilesMatch "^\.(env|git|editorconfig|npmrc|user\.ini)">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    <FilesMatch "^(artisan|composer\.json|composer\.lock|package\.json|vite\.config\.js|phpunit\.xml)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    # Forward all traffic to the public/ directory for shared hosting setups (cPanel)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>

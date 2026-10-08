@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 140" width="540" height="140" fill="none">
+  <defs>
+    <linearGradient id="ksWhiteAccent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Logo Emblem Group -->
+  <g transform="translate(10, 10)">
+    <!-- Shopping Bag Body -->
+    <path d="M22 45 L98 45 L112 115 C112 118 109 120 106 120 L14 120 C11 120 8 118 8 115 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    
+    <!-- Bag Handle -->
+    <path d="M42 45 C42 22 78 22 78 45" 
+          fill="none" stroke="url(#ksWhiteAccent)" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Kuwait Towers Silhouette Inside Bag -->
+    <!-- Center Main Tower -->
+    <line x1="60" y1="120" x2="60" y2="48" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="60" cy="85" r="11" fill="#FFFFFF"/>
+    <circle cx="60" cy="62" r="7.5" fill="#FFFFFF"/>
+    <polygon points="60,40 57.5,48 62.5,48" fill="#FFFFFF"/>
+
+    <!-- Left Secondary Tower -->
+    <line x1="38" y1="120" x2="38" y2="66" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="38" cy="94" r="8.5" fill="#FFFFFF"/>
+    <polygon points="38,58 36,66 40,66" fill="#FFFFFF"/>
+
+    <!-- Right Needle Tower -->
+    <line x1="82" y1="120" x2="82" y2="72" stroke="url(#ksWhiteAccent)" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="82,65 80.5,72 83.5,72" fill="url(#ksWhiteAccent)"/>
+  </g>
+
+  <!-- Typography: KuwaitSouq -->
+  <text x="145" y="72" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="46" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    Kuwait<tspan fill="#60A5FA">Souq</tspan>
+  </text>
+
+  <!-- Arabic Subtitle: سوق الكويت والخليج -->
+  <text x="147" y="108" font-family="'Segoe UI', Tahoma, Arial, 'Traditional Arabic', sans-serif" font-size="24" font-weight="700" fill="#34D399" letter-spacing="0.2">
+    سوق الكويت والخليج
+  </text>
+</svg>

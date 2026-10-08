@@ -1,0 +1,100 @@
+class CountryCode {
+  final String name;
+  final String flag;
+  final String dialCode;
+  final String code;
+
+  const CountryCode({
+    required this.name,
+    required this.flag,
+    required this.dialCode,
+    required this.code,
+  });
+
+  String get displayName => '$flag  $name ($dialCode)';
+}
+
+class CountryCodes {
+  static const CountryCode defaultCountry = CountryCode(
+    name: 'Kuwait',
+    flag: '🇰🇼',
+    dialCode: '+965',
+    code: 'KW',
+  );
+
+  static const List<CountryCode> all = [
+    CountryCode(name: 'Kuwait', flag: '🇰🇼', dialCode: '+965', code: 'KW'),
+    CountryCode(name: 'Saudi Arabia', flag: '🇸🇦', dialCode: '+966', code: 'SA'),
+    CountryCode(name: 'United Arab Emirates', flag: '🇦🇪', dialCode: '+971', code: 'AE'),
+    CountryCode(name: 'Qatar', flag: '🇶🇦', dialCode: '+974', code: 'QA'),
+    CountryCode(name: 'Bahrain', flag: '🇧🇭', dialCode: '+973', code: 'BH'),
+    CountryCode(name: 'Oman', flag: '🇴🇲', dialCode: '+968', code: 'OM'),
+    CountryCode(name: 'Egypt', flag: '🇪🇬', dialCode: '+20', code: 'EG'),
+    CountryCode(name: 'Jordan', flag: '🇯🇴', dialCode: '+962', code: 'JO'),
+    CountryCode(name: 'United States', flag: '🇺🇸', dialCode: '+1', code: 'US'),
+    CountryCode(name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44', code: 'GB'),
+    CountryCode(name: 'Bangladesh', flag: '🇧🇩', dialCode: '+880', code: 'BD'),
+    CountryCode(name: 'Pakistan', flag: '🇵🇰', dialCode: '+92', code: 'PK'),
+    CountryCode(name: 'Nepal', flag: '🇳🇵', dialCode: '+977', code: 'NP'),
+    CountryCode(name: 'Sri Lanka', flag: '🇱🇰', dialCode: '+94', code: 'LK'),
+    CountryCode(name: 'Canada', flag: '🇨🇦', dialCode: '+1', code: 'CA'),
+    CountryCode(name: 'Australia', flag: '🇦🇺', dialCode: '+61', code: 'AU'),
+    CountryCode(name: 'Germany', flag: '🇩🇪', dialCode: '+49', code: 'DE'),
+    CountryCode(name: 'France', flag: '🇫🇷', dialCode: '+33', code: 'FR'),
+    CountryCode(name: 'Italy', flag: '🇮🇹', dialCode: '+39', code: 'IT'),
+    CountryCode(name: 'Spain', flag: '🇪🇸', dialCode: '+34', code: 'ES'),
+    CountryCode(name: 'Singapore', flag: '🇸🇬', dialCode: '+65', code: 'SG'),
+    CountryCode(name: 'Malaysia', flag: '🇲🇾', dialCode: '+60', code: 'MY'),
+    CountryCode(name: 'Philippines', flag: '🇵🇭', dialCode: '+63', code: 'PH'),
+    CountryCode(name: 'Indonesia', flag: '🇮🇩', dialCode: '+62', code: 'ID'),
+    CountryCode(name: 'Japan', flag: '🇯🇵', dialCode: '+81', code: 'JP'),
+    CountryCode(name: 'South Korea', flag: '🇰🇷', dialCode: '+82', code: 'KR'),
+    CountryCode(name: 'China', flag: '🇨🇳', dialCode: '+86', code: 'CN'),
+    CountryCode(name: 'Hong Kong', flag: '🇭🇰', dialCode: '+852', code: 'HK'),
+    CountryCode(name: 'Taiwan', flag: '🇹🇼', dialCode: '+886', code: 'TW'),
+    CountryCode(name: 'Thailand', flag: '🇹🇭', dialCode: '+66', code: 'TH'),
+    CountryCode(name: 'Vietnam', flag: '🇻🇳', dialCode: '+84', code: 'VN'),
+    CountryCode(name: 'Turkey', flag: '🇹🇷', dialCode: '+90', code: 'TR'),
+    CountryCode(name: 'Egypt', flag: '🇪🇬', dialCode: '+20', code: 'EG'),
+    CountryCode(name: 'South Africa', flag: '🇿🇦', dialCode: '+27', code: 'ZA'),
+    CountryCode(name: 'Nigeria', flag: '🇳🇬', dialCode: '+234', code: 'NG'),
+    CountryCode(name: 'Kenya', flag: '🇰🇪', dialCode: '+254', code: 'KE'),
+    CountryCode(name: 'Brazil', flag: '🇧🇷', dialCode: '+55', code: 'BR'),
+    CountryCode(name: 'Mexico', flag: '🇲🇽', dialCode: '+52', code: 'MX'),
+    CountryCode(name: 'Argentina', flag: '🇦🇷', dialCode: '+54', code: 'AR'),
+    CountryCode(name: 'Russia', flag: '🇷🇺', dialCode: '+7', code: 'RU'),
+    CountryCode(name: 'Netherlands', flag: '🇳🇱', dialCode: '+31', code: 'NL'),
+    CountryCode(name: 'Switzerland', flag: '🇨🇭', dialCode: '+41', code: 'CH'),
+    CountryCode(name: 'Sweden', flag: '🇸🇪', dialCode: '+46', code: 'SE'),
+    CountryCode(name: 'Norway', flag: '🇳🇴', dialCode: '+47', code: 'NO'),
+    CountryCode(name: 'Denmark', flag: '🇩🇰', dialCode: '+45', code: 'DK'),
+    CountryCode(name: 'Finland', flag: '🇫🇮', dialCode: '+358', code: 'FI'),
+    CountryCode(name: 'Poland', flag: '🇵🇱', dialCode: '+48', code: 'PL'),
+    CountryCode(name: 'Belgium', flag: '🇧🇪', dialCode: '+32', code: 'BE'),
+    CountryCode(name: 'Austria', flag: '🇦🇹', dialCode: '+43', code: 'AT'),
+    CountryCode(name: 'Portugal', flag: '🇵🇹', dialCode: '+351', code: 'PT'),
+    CountryCode(name: 'Ireland', flag: '🇮🇪', dialCode: '+353', code: 'IE'),
+    CountryCode(name: 'New Zealand', flag: '🇳🇿', dialCode: '+64', code: 'NZ'),
+    CountryCode(name: 'Greece', flag: '🇬🇷', dialCode: '+30', code: 'GR'),
+    CountryCode(name: 'Jordan', flag: '🇯🇴', dialCode: '+962', code: 'JO'),
+    CountryCode(name: 'Lebanon', flag: '🇱🇧', dialCode: '+961', code: 'LB'),
+    CountryCode(name: 'Iraq', flag: '🇮🇶', dialCode: '+964', code: 'IQ'),
+    CountryCode(name: 'Morocco', flag: '🇲🇦', dialCode: '+212', code: 'MA'),
+    CountryCode(name: 'Algeria', flag: '🇩🇿', dialCode: '+213', code: 'DZ'),
+    CountryCode(name: 'Tunisia', flag: '🇹🇳', dialCode: '+216', code: 'TN'),
+    CountryCode(name: 'Yemen', flag: '🇾🇪', dialCode: '+967', code: 'YE'),
+    CountryCode(name: 'Syria', flag: '🇸🇾', dialCode: '+963', code: 'SY'),
+    CountryCode(name: 'Iran', flag: '🇮🇷', dialCode: '+98', code: 'IR'),
+    CountryCode(name: 'Afghanistan', flag: '🇦🇫', dialCode: '+93', code: 'AF'),
+    CountryCode(name: 'Ghana', flag: '🇬🇭', dialCode: '+233', code: 'GH'),
+    CountryCode(name: 'Ethiopia', flag: '🇪🇹', dialCode: '+251', code: 'ET'),
+    CountryCode(name: 'Uganda', flag: '🇺🇬', dialCode: '+256', code: 'UG'),
+    CountryCode(name: 'Tanzania', flag: '🇹🇿', dialCode: '+255', code: 'TZ'),
+    CountryCode(name: 'Colombia', flag: '🇨🇴', dialCode: '+57', code: 'CO'),
+    CountryCode(name: 'Chile', flag: '🇨🇱', dialCode: '+56', code: 'CL'),
+    CountryCode(name: 'Peru', flag: '🇵🇪', dialCode: '+51', code: 'PE'),
+    CountryCode(name: 'Maldives', flag: '🇲🇻', dialCode: '+960', code: 'MV'),
+    CountryCode(name: 'Myanmar', flag: '🇲🇲', dialCode: '+95', code: 'MM'),
+    CountryCode(name: 'Bhutan', flag: '🇧🇹', dialCode: '+975', code: 'BT'),
+  ];
+}
