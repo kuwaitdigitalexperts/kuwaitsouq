@@ -1,14 +1,12 @@
+
 -- ========================================================
--- KuwaitSouq Complete MySQL Database Import for Namecheap
--- Includes: Full Schema DDL + Complete GCC Seed Data
--- Generated: 2026-10-07 17:58:06
+-- KuwaitSouq Complete MySQL Database Import for Namecheap cPanel
+-- Includes: Full InnoDB DDL (Key length 191 safe) + GCC Seed Data
 -- ========================================================
 
 SET FOREIGN_KEY_CHECKS=0;
-SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET NAMES utf8mb4;
-
--- SCHEMA DDL --
 
 -- DROP EXISTING TABLES SAFELY --
 DROP TABLE IF EXISTS `messages`;
@@ -34,195 +32,358 @@ DROP TABLE IF EXISTS `sessions`;
 DROP TABLE IF EXISTS `password_reset_tokens`;
 DROP TABLE IF EXISTS `users`;
 
-create table `users` (`id` bigint unsigned not null auto_increment primary key, `name` varchar(255) not null, `email` varchar(255) not null, `email_verified_at` timestamp null, `password` varchar(255) not null, `remember_token` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
+-- SCHEMA DDL (ENGINE=InnoDB, VARCHAR(191) KEYS) --
+
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(191) NOT NULL,
+  `email` varchar(191) NOT NULL,
+  `phone` varchar(191) DEFAULT NULL,
+  `phone_code` varchar(10) NOT NULL DEFAULT "+965",
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
+  `is_admin` tinyint(1) NOT NULL DEFAULT "0",
+  `is_verified` tinyint(1) NOT NULL DEFAULT "0",
+  `member_type` varchar(191) NOT NULL DEFAULT "Free Member",
+  `member_id_number` varchar(20) DEFAULT NULL,
+  `member_since` date DEFAULT NULL,
+  `live_listings_limit` int NOT NULL DEFAULT "20",
+  `rating` decimal(3,1) NOT NULL DEFAULT "0.0",
+  `rating_count` int NOT NULL DEFAULT "0",
+  `listing_credits` int NOT NULL DEFAULT "0",
+  `vas_credits` int NOT NULL DEFAULT "0",
+  `cv_completeness` int NOT NULL DEFAULT "0",
+  `cv_views` int NOT NULL DEFAULT "0",
+  `job_applications_count` int NOT NULL DEFAULT "0",
+  `member_views` int NOT NULL DEFAULT "0",
+  `whatsapp` varchar(191) DEFAULT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(191) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `sessions` (
+  `id` varchar(191) NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `cache` (
+  `key` varchar(191) NOT NULL,
+  `value` mediumtext NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_expiration_index` (`expiration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(191) NOT NULL,
+  `owner` varchar(191) NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_locks_expiration_index` (`expiration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(191) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint unsigned NOT NULL,
+  `reserved_at` int unsigned DEFAULT NULL,
+  `available_at` int unsigned NOT NULL,
+  `created_at` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `job_batches` (
+  `id` varchar(191) NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `total_jobs` int NOT NULL,
+  `pending_jobs` int NOT NULL,
+  `failed_jobs` int NOT NULL,
+  `failed_job_ids` longtext NOT NULL,
+  `options` mediumtext DEFAULT NULL,
+  `cancelled_at` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `finished_at` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(191) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(191) NOT NULL,
+  `tokenable_id` bigint unsigned NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
+  KEY `personal_access_tokens_expires_at_index` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `countries` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(191) NOT NULL,
+  `name_ar` varchar(191) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `phone_code` varchar(10) NOT NULL,
+  `currency` varchar(10) NOT NULL,
+  `currency_ar` varchar(10) NOT NULL,
+  `flag` varchar(10) NOT NULL DEFAULT "🇰🇼",
+  `is_default` tinyint(1) NOT NULL DEFAULT "0",
+  `is_active` tinyint(1) NOT NULL DEFAULT "1",
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `countries_code_unique` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `cities` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `country_id` bigint unsigned NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `name_ar` varchar(191) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT "1",
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cities_country_id_pos_index` (`country_id`,`pos`),
+  CONSTRAINT `cities_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `neighborhoods` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `city_id` bigint unsigned NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `name_ar` varchar(191) NOT NULL,
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `neighborhoods_city_id_pos_index` (`city_id`,`pos`),
+  CONSTRAINT `neighborhoods_city_id_foreign` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `categories` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` bigint unsigned DEFAULT NULL,
+  `name` varchar(191) NOT NULL,
+  `name_ar` varchar(191) NOT NULL,
+  `slug` varchar(191) NOT NULL,
+  `icon` varchar(191) DEFAULT NULL,
+  `banner_image` varchar(255) DEFAULT NULL,
+  `pos` int NOT NULL DEFAULT "0",
+  `is_active` tinyint(1) NOT NULL DEFAULT "1",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categories_slug_unique` (`slug`),
+  KEY `categories_parent_id_pos_index` (`parent_id`,`pos`),
+  CONSTRAINT `categories_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `category_filters` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `category_id` bigint unsigned DEFAULT NULL,
+  `name` varchar(191) NOT NULL,
+  `name_ar` varchar(191) DEFAULT NULL,
+  `filter_key` varchar(191) NOT NULL,
+  `type` varchar(50) NOT NULL DEFAULT "select",
+  `is_pinned` tinyint(1) NOT NULL DEFAULT "1",
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `category_filters_category_id_pos_index` (`category_id`,`pos`),
+  KEY `category_filters_filter_key_index` (`filter_key`),
+  CONSTRAINT `category_filters_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `category_filter_options` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `category_filter_id` bigint unsigned NOT NULL,
+  `label` varchar(191) NOT NULL,
+  `label_ar` varchar(191) DEFAULT NULL,
+  `value` varchar(191) NOT NULL,
+  `icon` varchar(191) DEFAULT NULL,
+  `is_quick_card` tinyint(1) NOT NULL DEFAULT "0",
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `category_filter_options_category_filter_id_pos_index` (`category_filter_id`,`pos`),
+  KEY `category_filter_options_is_quick_card_index` (`is_quick_card`),
+  CONSTRAINT `category_filter_options_category_filter_id_foreign` FOREIGN KEY (`category_filter_id`) REFERENCES `category_filters` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `ads` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `category_id` bigint unsigned NOT NULL,
+  `sub_category_id` bigint unsigned DEFAULT NULL,
+  `country_id` bigint unsigned NOT NULL,
+  `city_id` bigint unsigned NOT NULL,
+  `neighborhood_id` bigint unsigned DEFAULT NULL,
+  `neighborhood_name` varchar(191) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `title_ar` varchar(255) DEFAULT NULL,
+  `description` text NOT NULL,
+  `description_ar` text DEFAULT NULL,
+  `price` decimal(12,2) NOT NULL DEFAULT "0.00",
+  `currency` varchar(10) NOT NULL DEFAULT "KWD",
+  `condition` varchar(50) NOT NULL DEFAULT "used",
+  `attributes` json DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `whatsapp` varchar(50) DEFAULT NULL,
+  `is_boosted` tinyint(1) NOT NULL DEFAULT "0",
+  `is_featured` tinyint(1) NOT NULL DEFAULT "0",
+  `views_count` int NOT NULL DEFAULT "0",
+  `favorites_count` int NOT NULL DEFAULT "0",
+  `status` varchar(50) NOT NULL DEFAULT "active",
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ads_country_id_city_id_index` (`country_id`,`city_id`),
+  KEY `ads_category_id_status_index` (`category_id`,`status`),
+  KEY `ads_is_boosted_index` (`is_boosted`),
+  KEY `ads_is_featured_index` (`is_featured`),
+  KEY `ads_published_at_index` (`published_at`),
+  CONSTRAINT `ads_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ads_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ads_sub_category_id_foreign` FOREIGN KEY (`sub_category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `ads_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ads_city_id_foreign` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ads_neighborhood_id_foreign` FOREIGN KEY (`neighborhood_id`) REFERENCES `neighborhoods` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `ad_media` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ad_id` bigint unsigned NOT NULL,
+  `type` enum("image","video") NOT NULL DEFAULT "image",
+  `file_path` varchar(255) NOT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT "0",
+  `pos` int NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ad_media_ad_id_pos_index` (`ad_id`,`pos`),
+  CONSTRAINT `ad_media_ad_id_foreign` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `seller_stories` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `ad_id` bigint unsigned DEFAULT NULL,
+  `media_path` varchar(255) NOT NULL,
+  `caption` varchar(255) DEFAULT NULL,
+  `ring_color` varchar(50) NOT NULL DEFAULT "orange",
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT "1",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `seller_stories_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `seller_stories_ad_id_foreign` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `saved_searches` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `title` varchar(191) DEFAULT NULL,
+  `category_id` bigint unsigned DEFAULT NULL,
+  `city_id` bigint unsigned DEFAULT NULL,
+  `filters` json DEFAULT NULL,
+  `notify_on_new` tinyint(1) NOT NULL DEFAULT "1",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `saved_searches_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `saved_searches_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `saved_searches_city_id_foreign` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `favorites` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `ad_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `favorites_user_id_ad_id_unique` (`user_id`,`ad_id`),
+  CONSTRAINT `favorites_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `favorites_ad_id_foreign` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `price_drop_alerts` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `ad_id` bigint unsigned NOT NULL,
+  `target_price` decimal(12,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `price_drop_alerts_user_id_ad_id_unique` (`user_id`,`ad_id`),
+  CONSTRAINT `price_drop_alerts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `price_drop_alerts_ad_id_foreign` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `messages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ad_id` bigint unsigned DEFAULT NULL,
+  `sender_id` bigint unsigned NOT NULL,
+  `receiver_id` bigint unsigned NOT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT "0",
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `messages_sender_id_receiver_id_index` (`sender_id`,`receiver_id`),
+  KEY `messages_receiver_id_is_read_index` (`receiver_id`,`is_read`),
+  CONSTRAINT `messages_ad_id_foreign` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `messages_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `messages_receiver_id_foreign` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-alter table `users` add unique `users_email_unique`(`email`);
-
-create table `password_reset_tokens` (`email` varchar(255) not null, `token` varchar(255) not null, `created_at` timestamp null, primary key (`email`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-create table `sessions` (`id` varchar(255) not null, `user_id` bigint unsigned null, `ip_address` varchar(45) null, `user_agent` text null, `payload` longtext not null, `last_activity` int not null, primary key (`id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `sessions` add index `sessions_user_id_index`(`user_id`);
-
-alter table `sessions` add index `sessions_last_activity_index`(`last_activity`);
-
-create table `cache` (`key` varchar(255) not null, `value` mediumtext not null, `expiration` bigint not null, primary key (`key`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `cache` add index `cache_expiration_index`(`expiration`);
-
-create table `cache_locks` (`key` varchar(255) not null, `owner` varchar(255) not null, `expiration` bigint not null, primary key (`key`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `cache_locks` add index `cache_locks_expiration_index`(`expiration`);
-
-create table `jobs` (`id` bigint unsigned not null auto_increment primary key, `queue` varchar(255) not null, `payload` longtext not null, `attempts` smallint unsigned not null, `reserved_at` int unsigned null, `available_at` int unsigned not null, `created_at` int unsigned not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `jobs` add index `jobs_queue_index`(`queue`);
-
-create table `job_batches` (`id` varchar(255) not null, `name` varchar(255) not null, `total_jobs` int not null, `pending_jobs` int not null, `failed_jobs` int not null, `failed_job_ids` longtext not null, `options` mediumtext null, `cancelled_at` int null, `created_at` int not null, `finished_at` int null, primary key (`id`)) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-create table `failed_jobs` (`id` bigint unsigned not null auto_increment primary key, `uuid` varchar(255) not null, `connection` varchar(255) not null, `queue` varchar(255) not null, `payload` longtext not null, `exception` longtext not null, `failed_at` timestamp not null default CURRENT_TIMESTAMP) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `failed_jobs` add index `failed_jobs_connection_queue_failed_at_index`(`connection`, `queue`, `failed_at`);
-
-alter table `failed_jobs` add unique `failed_jobs_uuid_unique`(`uuid`);
-
-create table `personal_access_tokens` (`id` bigint unsigned not null auto_increment primary key, `tokenable_type` varchar(255) not null, `tokenable_id` bigint unsigned not null, `name` text not null, `token` varchar(64) not null, `abilities` text null, `last_used_at` timestamp null, `expires_at` timestamp null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `personal_access_tokens` add index `personal_access_tokens_tokenable_type_tokenable_id_index`(`tokenable_type`, `tokenable_id`);
-
-alter table `personal_access_tokens` add unique `personal_access_tokens_token_unique`(`token`);
-
-alter table `personal_access_tokens` add index `personal_access_tokens_expires_at_index`(`expires_at`);
-
-alter table `users` add `phone` varchar(255) null after `email`;
-
-alter table `users` add `phone_code` varchar(10) not null default '+965' after `phone`;
-
-alter table `users` add `avatar` varchar(255) null after `password`;
-
-alter table `users` add `is_admin` tinyint(1) not null default '0' after `avatar`;
-
-alter table `users` add `is_verified` tinyint(1) not null default '0' after `is_admin`;
-
-alter table `users` add `member_type` varchar(255) not null default 'Free Member' after `is_verified`;
-
-alter table `users` add `member_id_number` varchar(20) null after `member_type`;
-
-alter table `users` add `member_since` date null after `member_id_number`;
-
-alter table `users` add `live_listings_limit` int not null default '20' after `member_since`;
-
-alter table `users` add `rating` decimal(3, 1) not null default '0' after `live_listings_limit`;
-
-alter table `users` add `rating_count` int not null default '0' after `rating`;
-
-alter table `users` add `listing_credits` int not null default '0' after `rating_count`;
-
-alter table `users` add `vas_credits` int not null default '0' after `listing_credits`;
-
-alter table `users` add `cv_completeness` int not null default '0' after `vas_credits`;
-
-alter table `users` add `cv_views` int not null default '0' after `cv_completeness`;
-
-alter table `users` add `job_applications_count` int not null default '0' after `cv_views`;
-
-alter table `users` add `member_views` int not null default '0' after `job_applications_count`;
-
-alter table `users` add `whatsapp` varchar(255) null after `member_views`;
-
-create table `countries` (`id` bigint unsigned not null auto_increment primary key, `name` varchar(255) not null, `name_ar` varchar(255) not null, `code` varchar(5) not null, `phone_code` varchar(10) not null, `currency` varchar(10) not null, `currency_ar` varchar(10) not null, `flag` varchar(10) not null default '🇰🇼', `is_default` tinyint(1) not null default '0', `is_active` tinyint(1) not null default '1', `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `countries` add unique `countries_code_unique`(`code`);
-
-create table `cities` (`id` bigint unsigned not null auto_increment primary key, `country_id` bigint unsigned not null, `name` varchar(255) not null, `name_ar` varchar(255) not null, `is_active` tinyint(1) not null default '1', `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `cities` add constraint `cities_country_id_foreign` foreign key (`country_id`) references `countries` (`id`) on delete cascade;
-
-alter table `cities` add index `cities_country_id_pos_index`(`country_id`, `pos`);
-
-create table `neighborhoods` (`id` bigint unsigned not null auto_increment primary key, `city_id` bigint unsigned not null, `name` varchar(255) not null, `name_ar` varchar(255) not null, `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `neighborhoods` add constraint `neighborhoods_city_id_foreign` foreign key (`city_id`) references `cities` (`id`) on delete cascade;
-
-alter table `neighborhoods` add index `neighborhoods_city_id_pos_index`(`city_id`, `pos`);
-
-create table `categories` (`id` bigint unsigned not null auto_increment primary key, `parent_id` bigint unsigned null, `name` varchar(255) not null, `name_ar` varchar(255) not null, `slug` varchar(255) not null, `icon` varchar(255) null, `banner_image` varchar(255) null, `pos` int not null default '0', `is_active` tinyint(1) not null default '1', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `categories` add constraint `categories_parent_id_foreign` foreign key (`parent_id`) references `categories` (`id`) on delete cascade;
-
-alter table `categories` add index `categories_parent_id_pos_index`(`parent_id`, `pos`);
-
-alter table `categories` add unique `categories_slug_unique`(`slug`);
-
-create table `category_filters` (`id` bigint unsigned not null auto_increment primary key, `category_id` bigint unsigned null, `name` varchar(255) not null, `name_ar` varchar(255) null, `filter_key` varchar(255) not null, `type` varchar(255) not null default 'select', `is_pinned` tinyint(1) not null default '1', `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `category_filters` add constraint `category_filters_category_id_foreign` foreign key (`category_id`) references `categories` (`id`) on delete cascade;
-
-alter table `category_filters` add index `category_filters_category_id_pos_index`(`category_id`, `pos`);
-
-alter table `category_filters` add index `category_filters_filter_key_index`(`filter_key`);
-
-create table `category_filter_options` (`id` bigint unsigned not null auto_increment primary key, `category_filter_id` bigint unsigned not null, `label` varchar(255) not null, `label_ar` varchar(255) null, `value` varchar(255) not null, `icon` varchar(255) null, `is_quick_card` tinyint(1) not null default '0', `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `category_filter_options` add constraint `category_filter_options_category_filter_id_foreign` foreign key (`category_filter_id`) references `category_filters` (`id`) on delete cascade;
-
-alter table `category_filter_options` add index `category_filter_options_category_filter_id_pos_index`(`category_filter_id`, `pos`);
-
-alter table `category_filter_options` add index `category_filter_options_is_quick_card_index`(`is_quick_card`);
-
-create table `ads` (`id` bigint unsigned not null auto_increment primary key, `user_id` bigint unsigned not null, `category_id` bigint unsigned not null, `sub_category_id` bigint unsigned null, `country_id` bigint unsigned not null, `city_id` bigint unsigned not null, `neighborhood_id` bigint unsigned null, `neighborhood_name` varchar(255) null, `title` varchar(255) not null, `title_ar` varchar(255) null, `description` text not null, `description_ar` text null, `price` decimal(12, 2) not null default '0', `currency` varchar(10) not null default 'KWD', `condition` varchar(255) not null default 'used', `attributes` json null, `phone` varchar(255) null, `whatsapp` varchar(255) null, `is_boosted` tinyint(1) not null default '0', `is_featured` tinyint(1) not null default '0', `views_count` int not null default '0', `favorites_count` int not null default '0', `status` varchar(255) not null default 'active', `published_at` timestamp null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `ads` add constraint `ads_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade;
-
-alter table `ads` add constraint `ads_category_id_foreign` foreign key (`category_id`) references `categories` (`id`) on delete cascade;
-
-alter table `ads` add constraint `ads_sub_category_id_foreign` foreign key (`sub_category_id`) references `categories` (`id`) on delete set null;
-
-alter table `ads` add constraint `ads_country_id_foreign` foreign key (`country_id`) references `countries` (`id`) on delete cascade;
-
-alter table `ads` add constraint `ads_city_id_foreign` foreign key (`city_id`) references `cities` (`id`) on delete cascade;
-
-alter table `ads` add constraint `ads_neighborhood_id_foreign` foreign key (`neighborhood_id`) references `neighborhoods` (`id`) on delete set null;
-
-alter table `ads` add index `ads_country_id_city_id_index`(`country_id`, `city_id`);
-
-alter table `ads` add index `ads_category_id_status_index`(`category_id`, `status`);
-
-alter table `ads` add index `ads_is_boosted_index`(`is_boosted`);
-
-alter table `ads` add index `ads_is_featured_index`(`is_featured`);
-
-alter table `ads` add index `ads_published_at_index`(`published_at`);
-
-create table `ad_media` (`id` bigint unsigned not null auto_increment primary key, `ad_id` bigint unsigned not null, `type` enum('image', 'video') not null default 'image', `file_path` varchar(255) not null, `is_primary` tinyint(1) not null default '0', `pos` int not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `ad_media` add constraint `ad_media_ad_id_foreign` foreign key (`ad_id`) references `ads` (`id`) on delete cascade;
-
-alter table `ad_media` add index `ad_media_ad_id_pos_index`(`ad_id`, `pos`);
-
-create table `seller_stories` (`id` bigint unsigned not null auto_increment primary key, `user_id` bigint unsigned not null, `ad_id` bigint unsigned null, `media_path` varchar(255) not null, `caption` varchar(255) null, `ring_color` varchar(255) not null default 'orange', `expires_at` timestamp null, `is_active` tinyint(1) not null default '1', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `seller_stories` add constraint `seller_stories_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade;
-
-alter table `seller_stories` add constraint `seller_stories_ad_id_foreign` foreign key (`ad_id`) references `ads` (`id`) on delete set null;
-
-create table `saved_searches` (`id` bigint unsigned not null auto_increment primary key, `user_id` bigint unsigned not null, `title` varchar(255) null, `category_id` bigint unsigned null, `city_id` bigint unsigned null, `filters` json null, `notify_on_new` tinyint(1) not null default '1', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `saved_searches` add constraint `saved_searches_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade;
-
-alter table `saved_searches` add constraint `saved_searches_category_id_foreign` foreign key (`category_id`) references `categories` (`id`) on delete set null;
-
-alter table `saved_searches` add constraint `saved_searches_city_id_foreign` foreign key (`city_id`) references `cities` (`id`) on delete set null;
-
-create table `favorites` (`id` bigint unsigned not null auto_increment primary key, `user_id` bigint unsigned not null, `ad_id` bigint unsigned not null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `favorites` add constraint `favorites_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade;
-
-alter table `favorites` add constraint `favorites_ad_id_foreign` foreign key (`ad_id`) references `ads` (`id`) on delete cascade;
-
-alter table `favorites` add unique `favorites_user_id_ad_id_unique`(`user_id`, `ad_id`);
-
-create table `price_drop_alerts` (`id` bigint unsigned not null auto_increment primary key, `user_id` bigint unsigned not null, `ad_id` bigint unsigned not null, `target_price` decimal(12, 2) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `price_drop_alerts` add constraint `price_drop_alerts_user_id_foreign` foreign key (`user_id`) references `users` (`id`) on delete cascade;
-
-alter table `price_drop_alerts` add constraint `price_drop_alerts_ad_id_foreign` foreign key (`ad_id`) references `ads` (`id`) on delete cascade;
-
-alter table `price_drop_alerts` add unique `price_drop_alerts_user_id_ad_id_unique`(`user_id`, `ad_id`);
-
-create table `messages` (`id` bigint unsigned not null auto_increment primary key, `ad_id` bigint unsigned null, `sender_id` bigint unsigned not null, `receiver_id` bigint unsigned not null, `message` text not null, `is_read` tinyint(1) not null default '0', `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
-
-alter table `messages` add constraint `messages_ad_id_foreign` foreign key (`ad_id`) references `ads` (`id`) on delete set null;
-
-alter table `messages` add constraint `messages_sender_id_foreign` foreign key (`sender_id`) references `users` (`id`) on delete cascade;
-
-alter table `messages` add constraint `messages_receiver_id_foreign` foreign key (`receiver_id`) references `users` (`id`) on delete cascade;
-
-alter table `messages` add index `messages_sender_id_receiver_id_index`(`sender_id`, `receiver_id`);
-
-alter table `messages` add index `messages_receiver_id_is_read_index`(`receiver_id`, `is_read`);
 
 -- SEED DATA --
+
 
 -- ----------------------------
 -- Records of countries
