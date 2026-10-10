@@ -10,6 +10,30 @@ SET NAMES utf8mb4;
 
 -- SCHEMA DDL --
 
+-- DROP EXISTING TABLES SAFELY --
+DROP TABLE IF EXISTS `messages`;
+DROP TABLE IF EXISTS `price_drop_alerts`;
+DROP TABLE IF EXISTS `favorites`;
+DROP TABLE IF EXISTS `saved_searches`;
+DROP TABLE IF EXISTS `seller_stories`;
+DROP TABLE IF EXISTS `ad_media`;
+DROP TABLE IF EXISTS `ads`;
+DROP TABLE IF EXISTS `category_filter_options`;
+DROP TABLE IF EXISTS `category_filters`;
+DROP TABLE IF EXISTS `categories`;
+DROP TABLE IF EXISTS `neighborhoods`;
+DROP TABLE IF EXISTS `cities`;
+DROP TABLE IF EXISTS `countries`;
+DROP TABLE IF EXISTS `personal_access_tokens`;
+DROP TABLE IF EXISTS `failed_jobs`;
+DROP TABLE IF EXISTS `job_batches`;
+DROP TABLE IF EXISTS `jobs`;
+DROP TABLE IF EXISTS `cache_locks`;
+DROP TABLE IF EXISTS `cache`;
+DROP TABLE IF EXISTS `sessions`;
+DROP TABLE IF EXISTS `password_reset_tokens`;
+DROP TABLE IF EXISTS `users`;
+
 create table `users` (`id` bigint unsigned not null auto_increment primary key, `name` varchar(255) not null, `email` varchar(255) not null, `email_verified_at` timestamp null, `password` varchar(255) not null, `remember_token` varchar(100) null, `created_at` timestamp null, `updated_at` timestamp null) default character set utf8mb4 collate 'utf8mb4_unicode_ci';
 
 alter table `users` add unique `users_email_unique`(`email`);
