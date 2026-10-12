@@ -203,31 +203,32 @@ class AuthProvider extends ChangeNotifier {
           _status = AuthStatus.authenticated;
           ok = true;
         } catch (_) {
-        try {
-          final shortDigits = cleanPhone.length > 4 ? cleanPhone.substring(cleanPhone.length - 4) : cleanPhone;
-          final data = await _api.register(
-            'KuwaitSouq User $shortDigits',
-            email,
-            fallbackPass,
-          );
-          await ApiClient.saveToken(data['token']);
-          if (data['user'] != null) {
-            _user = Map<String, dynamic>.from(data['user']);
+          try {
+            final shortDigits = cleanPhone.length > 4 ? cleanPhone.substring(cleanPhone.length - 4) : cleanPhone;
+            final data = await _api.register(
+              'KuwaitSouq User $shortDigits',
+              email,
+              fallbackPass,
+            );
+            await ApiClient.saveToken(data['token']);
+            if (data['user'] != null) {
+              _user = Map<String, dynamic>.from(data['user']);
+              await ApiClient.saveUser(_user!);
+            }
+            _status = AuthStatus.authenticated;
+            ok = true;
+          } catch (regErr) {
+            debugPrint('Backend phone register fallback: $regErr');
+            _user = {
+              'id': cleanPhone.hashCode.abs() % 100000,
+              'name': 'KuwaitSouq Member',
+              'email': email,
+              'phone': phoneNumber,
+            };
             await ApiClient.saveUser(_user!);
+            _status = AuthStatus.authenticated;
+            ok = true;
           }
-          _status = AuthStatus.authenticated;
-          ok = true;
-        } catch (regErr) {
-          debugPrint('Backend phone register fallback: $regErr');
-          _user = {
-            'id': cleanPhone.hashCode.abs() % 100000,
-            'name': 'KuwaitSouq Member',
-            'email': email,
-            'phone': phoneNumber,
-          };
-          await ApiClient.saveUser(_user!);
-          _status = AuthStatus.authenticated;
-          ok = true;
         }
       }
       return ok;

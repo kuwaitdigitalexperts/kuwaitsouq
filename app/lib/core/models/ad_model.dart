@@ -17,6 +17,9 @@ class AdModel {
   final Map<String, dynamic>? user;
   final List<dynamic>? media;
   final String? createdAt;
+  final bool isBoosted;
+  final String? phone;
+  final String? whatsapp;
 
   const AdModel({
     required this.id,
@@ -27,6 +30,9 @@ class AdModel {
     required this.condition,
     required this.isFeatured,
     required this.isUrgent,
+    this.isBoosted = false,
+    this.phone,
+    this.whatsapp,
     this.categoryId,
     this.locationId,
     this.userId,
@@ -66,6 +72,13 @@ class AdModel {
           : null,
       media: json['media'] as List<dynamic>?,
       createdAt: json['created_at'] as String?,
+      isBoosted: json['is_boosted'] == true ||
+          json['is_boosted'] == 1 ||
+          json['is_boosted'] == '1',
+      phone: json['phone']?.toString() ??
+          (json['user'] is Map ? json['user']['phone']?.toString() : null),
+      whatsapp: json['whatsapp']?.toString() ??
+          (json['user'] is Map ? json['user']['whatsapp']?.toString() : null),
     );
   }
 
@@ -78,6 +91,9 @@ class AdModel {
     String? condition,
     bool? isFeatured,
     bool? isUrgent,
+    bool? isBoosted,
+    String? phone,
+    String? whatsapp,
     int? categoryId,
     int? locationId,
     int? userId,
@@ -96,6 +112,9 @@ class AdModel {
       condition: condition ?? this.condition,
       isFeatured: isFeatured ?? this.isFeatured,
       isUrgent: isUrgent ?? this.isUrgent,
+      isBoosted: isBoosted ?? this.isBoosted,
+      phone: phone ?? this.phone,
+      whatsapp: whatsapp ?? this.whatsapp,
       categoryId: categoryId ?? this.categoryId,
       locationId: locationId ?? this.locationId,
       userId: userId ?? this.userId,

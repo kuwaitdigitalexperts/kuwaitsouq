@@ -83,7 +83,9 @@ class AdsProvider extends ChangeNotifier {
       final data = await _api.getAd(id);
       final fetched = AdModel.fromJson(Map<String, dynamic>.from(data));
       if ((fetched.media == null || fetched.media!.isEmpty) &&
-          (existing?.media != null && existing.media!.isNotEmpty)) {
+          existing != null &&
+          existing.media != null &&
+          existing.media!.isNotEmpty) {
         _currentAd = fetched.copyWith(media: existing.media);
       } else {
         _currentAd = fetched;

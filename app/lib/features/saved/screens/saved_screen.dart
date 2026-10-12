@@ -74,7 +74,6 @@ class _SavedScreenState extends State<SavedScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (ctx, i) => AdCard(
                         ad: favorites[i],
-                        isGrid: false,
                       ),
                     ),
                   ),
