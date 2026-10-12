@@ -21,7 +21,7 @@ class ApiClient {
       return customUrl;
     }
 
-    const useLocal = bool.fromEnvironment('USE_LOCAL', defaultValue: !kReleaseMode);
+    const useLocal = bool.fromEnvironment('USE_LOCAL', defaultValue: false);
     if (useLocal) {
       return defaultTargetPlatform == TargetPlatform.android
           ? localAndroidUrl
