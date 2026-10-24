@@ -302,6 +302,79 @@ class ApiController extends Controller
     }
 
     /**
+     * User registration with Email and Password
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => '965' . mt_rand(1000000, 9999999),
+            'phone_code' => '+965',
+            'password' => Hash::make($request->password),
+            'is_verified' => true,
+            'member_type' => 'Free Member',
+            'member_id_number' => (string) mt_rand(10000000, 99999999),
+            'member_since' => now(),
+            'live_listings_limit' => 20,
+            'listing_credits' => 5,
+            'vas_credits' => 1,
+        ]);
+
+        $token = $user->createToken('mobile_app')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Social Authentication (Google / Apple)
+     */
+    public function socialAuth(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'provider' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $request->name ?: ucfirst($request->provider) . ' User',
+                'email' => $request->email,
+                'phone' => '965' . mt_rand(1000000, 9999999),
+                'phone_code' => '+965',
+                'password' => Hash::make(Str::random(16)),
+                'is_verified' => true,
+                'member_type' => 'Free Member',
+                'member_id_number' => (string) mt_rand(10000000, 99999999),
+                'member_since' => now(),
+                'live_listings_limit' => 20,
+                'listing_credits' => 5,
+                'vas_credits' => 1,
+            ]);
+        }
+
+        $token = $user->createToken('mobile_app')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Phone Authentication (turnkey for Firebase phone auth token)
      */
     public function phoneAuth(Request $request)

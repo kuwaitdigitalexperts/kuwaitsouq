@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_bottom_sheet.dart';
 import '../../ads/widgets/ad_card.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -76,6 +78,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       _selectedCategorySlug = widget.categorySlug!;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        AuthBottomSheet.show(context);
+      }
       context.read<AdsProvider>().fetchAds();
     });
   }

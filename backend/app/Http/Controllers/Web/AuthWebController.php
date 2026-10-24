@@ -51,17 +51,18 @@ class AuthWebController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20|unique:users,phone',
-            'phone_code' => 'required|string|max:10',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            // Phone auth commented out for now:
+            // 'phone' => 'nullable|string|max:20',
+            // 'phone_code' => 'nullable|string|max:10',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
-            'phone' => preg_replace('/[^0-9]/', '', $validated['phone']),
-            'phone_code' => $validated['phone_code'],
-            'email' => $validated['email'] ?? null,
+            'email' => $validated['email'],
+            'phone' => '965' . mt_rand(1000000, 9999999),
+            'phone_code' => '+965',
             'password' => Hash::make($validated['password']),
             'member_type' => 'Free Member',
             'member_id_number' => (string) mt_rand(10000000, 99999999),
@@ -77,6 +78,35 @@ class AuthWebController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('account')->with('success', 'Account registered successfully!');
+    }
+
+    public function socialLogin(string $provider)
+    {
+        $providerName = ucfirst($provider);
+        $dummyEmail = strtolower($provider) . '_user@kuwaitsouq.com';
+
+        $user = User::firstOrCreate(
+            ['email' => $dummyEmail],
+            [
+                'name' => "$providerName Member",
+                'phone' => '965' . mt_rand(1000000, 9999999),
+                'phone_code' => '+965',
+                'password' => Hash::make(uniqid('social_', true)),
+                'member_type' => 'Free Member',
+                'member_id_number' => (string) mt_rand(10000000, 99999999),
+                'member_since' => Carbon::now(),
+                'live_listings_limit' => 20,
+                'rating' => 5.0,
+                'rating_count' => 1,
+                'listing_credits' => 5,
+                'vas_credits' => 2,
+            ]
+        );
+
+        Auth::login($user);
+        session()->regenerate();
+
+        return redirect()->route('account')->with('success', "Logged in with $providerName successfully!");
     }
 
     /**

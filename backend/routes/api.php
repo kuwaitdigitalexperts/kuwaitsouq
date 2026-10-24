@@ -36,8 +36,10 @@ $apiRoutes = function () {
     // Auth
     Route::post('/register', [ApiController::class, 'register']);
     Route::post('/login', [ApiController::class, 'login']);
+    Route::post('/auth/register', [ApiController::class, 'register']);
     Route::post('/auth/login', [ApiController::class, 'login']);
-    Route::post('/auth/phone', [ApiController::class, 'phoneAuth']);
+    Route::post('/auth/social', [ApiController::class, 'socialAuth']);
+    // Route::post('/auth/phone', [ApiController::class, 'phoneAuth']); // Phone Auth commented out for now
     Route::post('/logout', [ApiController::class, 'logout']);
 
     // User Profile & Account

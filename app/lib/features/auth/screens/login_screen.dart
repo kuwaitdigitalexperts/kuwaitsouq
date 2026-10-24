@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _otpController = TextEditingController();
 
-  bool _isPasswordMode = false;
+  bool _isPasswordMode = true; // Email & Password default; Phone Auth commented out for now
   bool _isOtpSent = false;
   bool _obscurePassword = true;
   bool _isLocalLoading = false;
@@ -592,7 +592,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 14),
 
-                    // Toggle between Mobile and Password login
+                    // Toggle between Mobile and Password login (Phone auth commented out for now)
+                    /*
                     TextButton(
                       onPressed: () {
                         setState(() {
@@ -609,6 +610,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    */
 
                     const SizedBox(height: 22),
 

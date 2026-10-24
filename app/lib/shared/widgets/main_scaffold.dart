@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/providers/auth_provider.dart';
 import 'kuwaitsouq_logo.dart';
+import 'auth_bottom_sheet.dart';
 
 class MainScaffold extends StatefulWidget {
   final Widget child;
@@ -16,7 +19,21 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   static const _routes = ['/', '/categories', '/post-ad', '/listings', '/account'];
 
-  void _onTabTapped(int index) {
+  void _onTabTapped(int index) async {
+    // If user is a guest, intercept tabs: Categories (1), Post Ad (2), Listings (3), Profile (4)
+    if (index > 0) {
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        final loggedIn = await AuthBottomSheet.show(context);
+        if (loggedIn != true && mounted) {
+          final refreshedAuth = context.read<AuthProvider>();
+          if (!refreshedAuth.isAuthenticated) {
+            return;
+          }
+        }
+      }
+    }
+    if (!mounted) return;
     setState(() => _currentIndex = index);
     context.go(_routes[index]);
   }
@@ -166,9 +183,14 @@ class _MainScaffoldState extends State<MainScaffold> {
             ListTile(
               leading: const Icon(Icons.grid_view, color: Color(0xFF0D9488)),
               title: Text(context.tr('categories_title')),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                context.go('/categories');
+                final auth = context.read<AuthProvider>();
+                if (!auth.isAuthenticated) {
+                  final loggedIn = await AuthBottomSheet.show(context);
+                  if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                }
+                if (context.mounted) context.go('/categories');
               },
             ),
             ListTile(
@@ -190,17 +212,27 @@ class _MainScaffoldState extends State<MainScaffold> {
             ListTile(
               leading: const Icon(Icons.article, color: Color(0xFFF59E0B)),
               title: Text(context.tr('nav_my_ads')),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                context.go('/listings');
+                final auth = context.read<AuthProvider>();
+                if (!auth.isAuthenticated) {
+                  final loggedIn = await AuthBottomSheet.show(context);
+                  if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                }
+                if (context.mounted) context.go('/listings');
               },
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF8B5CF6)),
               title: Text(context.tr('nav_account')),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                context.go('/account');
+                final auth = context.read<AuthProvider>();
+                if (!auth.isAuthenticated) {
+                  final loggedIn = await AuthBottomSheet.show(context);
+                  if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                }
+                if (context.mounted) context.go('/account');
               },
             ),
             const Spacer(),

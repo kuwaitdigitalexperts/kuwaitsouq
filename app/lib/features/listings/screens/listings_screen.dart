@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_bottom_sheet.dart';
 import '../../ads/widgets/ad_card.dart';
 
 class ListingsScreen extends StatefulWidget {
@@ -19,12 +21,85 @@ class _ListingsScreenState extends State<ListingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdsProvider>().fetchMyAds();
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        AuthBottomSheet.show(context);
+      } else {
+        context.read<AdsProvider>().fetchMyAds();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.5,
+          title: Text(
+            context.tr('nav_my_ads'),
+            style: const TextStyle(
+              color: AppTheme.textDark,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.article_outlined, size: 40, color: Color(0xFF2563EB)),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  context.isArabic ? 'سجل دخولك لعرض إعلاناتك' : 'Sign in to view your listings',
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.isArabic
+                      ? 'يمكنك متابعة إعلاناتك، ترقيتها، وتعديلها بعد تسجيل الدخول'
+                      : 'You can manage, edit, and boost your ads after logging in',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 220,
+                  height: 46,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () => AuthBottomSheet.show(context),
+                    child: Text(
+                      context.isArabic ? 'تسجيل الدخول / حساب جديد' : 'Sign In / Register',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final adsProvider = context.watch<AdsProvider>();
     final myListings = adsProvider.myAds.isNotEmpty ? adsProvider.myAds : adsProvider.ads;
 

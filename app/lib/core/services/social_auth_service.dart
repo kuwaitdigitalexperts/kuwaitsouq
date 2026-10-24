@@ -241,6 +241,35 @@ class SocialAuthService {
     }
   }
 
+  /// Sign in with Apple via Firebase OAuthProvider
+  static Future<SocialAuthResult> signInWithApple() async {
+    try {
+      final auth = await _getAuth();
+      final appleProvider = OAuthProvider("apple.com");
+      appleProvider.addScope('email');
+      appleProvider.addScope('name');
+      final userCredential = await auth.signInWithProvider(appleProvider);
+
+      final email = userCredential.user?.email ?? 'apple_${userCredential.user?.uid ?? "user"}@kuwaitsouq.com';
+      final displayName = userCredential.user?.displayName ?? 'Apple User';
+      final uid = userCredential.user?.uid ?? 'apple_${DateTime.now().millisecondsSinceEpoch}';
+
+      return SocialAuthResult.success(
+        email: email,
+        displayName: displayName,
+        uid: uid,
+        provider: 'Apple',
+      );
+    } catch (e) {
+      debugPrint('Apple sign in error: $e');
+      final errStr = e.toString();
+      if (errStr.contains('canceled') || errStr.contains('CANCELED')) {
+        return SocialAuthResult.canceled(provider: 'Apple');
+      }
+      return SocialAuthResult.error('Apple Sign-In error: $e', provider: 'Apple');
+    }
+  }
+
   /// Complete logout from all social providers
   static Future<void> signOut() async {
     try {

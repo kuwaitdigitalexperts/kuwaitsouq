@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/ads_provider.dart';
+import '../../../../core/services/social_auth_service.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/widgets/kuwaitsouq_logo.dart';
@@ -53,6 +54,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
           content: Text(err),
           duration: const Duration(seconds: 4),
         ),
+      );
+    }
+  }
+
+  Future<void> _handleSocialLogin(String provider) async {
+    final result = provider == 'Google'
+        ? await SocialAuthService.signInWithGoogle()
+        : await SocialAuthService.signInWithApple();
+
+    if (!mounted || result.isCanceled) return;
+
+    if (result.isSuccess && result.email != null) {
+      final ok = await context.read<AuthProvider>().loginWithSocial(
+            email: result.email!,
+            name: result.displayName ?? 'KuwaitSouq User',
+            provider: provider,
+            photoUrl: result.photoUrl,
+          );
+      if (!mounted) return;
+      if (ok) {
+        try {
+          context.read<AdsProvider>().fetchAds();
+        } catch (_) {}
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop(true);
+        } else {
+          context.go('/');
+        }
+      }
+    } else if (result.isError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.redAccent, content: Text(result.errorMessage ?? 'Sign in failed')),
       );
     }
   }
@@ -195,6 +228,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Social divider
+              Row(
+                children: [
+                  const Expanded(child: Divider(color: AppTheme.borderLight)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      isAr ? 'أو التسجيل عبر' : 'Or register with',
+                      style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                    ),
+                  ),
+                  const Expanded(child: Divider(color: AppTheme.borderLight)),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Google and Apple Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        side: const BorderSide(color: AppTheme.borderLight),
+                      ),
+                      onPressed: () => _handleSocialLogin('Google'),
+                      icon: const Text('G', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF4285F4))),
+                      label: const Text('Google', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        side: const BorderSide(color: AppTheme.borderLight),
+                      ),
+                      onPressed: () => _handleSocialLogin('Apple'),
+                      icon: const Icon(Icons.apple, color: Colors.black, size: 20),
+                      label: const Text('Apple', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
 
               // Switch to Login
               Center(

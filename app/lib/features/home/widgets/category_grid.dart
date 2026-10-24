@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_bottom_sheet.dart';
 
 class CategoryGrid extends StatelessWidget {
   const CategoryGrid({super.key});
@@ -328,12 +331,22 @@ class CategoryGrid extends StatelessWidget {
               final iconColor = cat['icon_color'] as Color;
 
               return InkWell(
-                onTap: () {
+                onTap: () async {
                   final action = cat['is_special_action'] as String?;
                   if (action == 'all_categories') {
-                    context.go('/categories');
+                    final auth = context.read<AuthProvider>();
+                    if (!auth.isAuthenticated) {
+                      final loggedIn = await AuthBottomSheet.show(context);
+                      if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                    }
+                    if (context.mounted) context.go('/categories');
                   } else if (action == 'post_ad') {
-                    context.go('/post-ad');
+                    final auth = context.read<AuthProvider>();
+                    if (!auth.isAuthenticated) {
+                      final loggedIn = await AuthBottomSheet.show(context);
+                      if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                    }
+                    if (context.mounted) context.go('/post-ad');
                   } else {
                     final catId = cat['id'] as int;
                     context.push(

@@ -40,6 +40,18 @@ class _PostAdScreenState extends State<PostAdScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        AuthBottomSheet.show(context).then((loggedIn) {
+          if (loggedIn != true && mounted && !context.read<AuthProvider>().isAuthenticated) {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/');
+            }
+          }
+        });
+      }
       context.read<CategoriesProvider>().fetchCategories();
       context.read<CategoriesProvider>().fetchLocations();
     });

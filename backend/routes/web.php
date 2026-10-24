@@ -38,6 +38,7 @@ Route::get('/login', [AuthWebController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthWebController::class, 'login'])->name('login.post');
 Route::get('/register', [AuthWebController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthWebController::class, 'register'])->name('register.post');
+Route::get('/auth/{provider}', [AuthWebController::class, 'socialLogin'])->name('social.login');
 Route::post('/logout', [AuthWebController::class, 'logout'])->name('logout');
 
 // 4. Main App & Web Portal
