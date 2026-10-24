@@ -24,6 +24,11 @@ class Category extends Model
         'pos' => 'integer',
     ];
 
+    protected $appends = [
+        'display_name',
+        'icon_url',
+    ];
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
@@ -52,5 +57,20 @@ class Category extends Model
     public function getDisplayNameAttribute(): string
     {
         return app()->getLocale() === 'ar' ? $this->name_ar : $this->name;
+    }
+
+    public function getIconUrlAttribute(): string
+    {
+        $slugUnderscore = str_replace('-', '_', $this->slug);
+        if (file_exists(public_path("images/categories/{$slugUnderscore}.png"))) {
+            return asset("images/categories/{$slugUnderscore}.png");
+        }
+        if (!empty($this->icon)) {
+            $iconFileName = str_ends_with($this->icon, '.png') ? $this->icon : "{$this->icon}.png";
+            if (file_exists(public_path("images/categories/{$iconFileName}"))) {
+                return asset("images/categories/{$iconFileName}");
+            }
+        }
+        return asset("images/categories/all_categories.png");
     }
 }

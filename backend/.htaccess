@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Force HTTPS Redirect
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Prevent direct access to sensitive files
     <FilesMatch "^\.(env|git|editorconfig|npmrc|user\.ini)">
         Order allow,deny
@@ -15,4 +20,8 @@
     # Forward all traffic to the public/ directory for shared hosting setups (cPanel)
     RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>

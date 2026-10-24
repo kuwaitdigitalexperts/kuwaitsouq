@@ -36,7 +36,7 @@ class _SearchScreenState extends State<SearchScreen> {
         titleSpacing: 0,
         title: Container(
           height: 42,
-          margin: const EdgeInsets.only(right: 14),
+          margin: const EdgeInsetsDirectional.only(end: 14),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: const Color(0xFFF1F4F2),
@@ -51,9 +51,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   controller: _ctrl,
                   autofocus: true,
                   style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
-                  decoration: const InputDecoration(
-                    hintText: 'I am looking for...',
-                    hintStyle: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: context.tr('search_in_kuwaitsouq'),
+                    hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                     border: InputBorder.none,
                     isDense: true,
                   ),

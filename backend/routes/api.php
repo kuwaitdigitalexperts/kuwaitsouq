@@ -10,10 +10,10 @@ use App\Http\Controllers\API\ApiController;
 */
 
 $apiRoutes = function () {
-    // Countries & Locations
+    // Countries & Kuwait Locations
     Route::get('/countries', [ApiController::class, 'countries']);
     Route::get('/countries/{id}/cities', [ApiController::class, 'cities']);
-    Route::get('/locations', [ApiController::class, 'countries']);
+    Route::get('/locations', [ApiController::class, 'locations']);
 
     // Categories & Filters
     Route::get('/categories', [ApiController::class, 'categories']);

@@ -24,6 +24,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.isArabic;
     final chat = context.watch<ChatProvider>();
     final auth = context.watch<AuthProvider>();
     final myId = int.tryParse(auth.user?['id']?.toString() ?? '');
@@ -53,7 +54,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          context.tr('conversations_title'),
+          isArabic ? 'المحادثات' : 'Conversations',
           style: const TextStyle(
             color: AppTheme.textDark,
             fontSize: 18,
@@ -83,7 +84,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        context.tr('no_conversations'),
+                        isArabic ? 'لا توجد محادثات' : 'No Conversations',
                         style: const TextStyle(
                           color: AppTheme.textDark,
                           fontSize: 16,
@@ -91,12 +92,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 32),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Text(
-                          'تواصل مع المعلنين والمشترين مباشرة من تفاصيل أي إعلان وستظهر محادثاتك هنا',
+                          isArabic
+                              ? 'تواصل مع المعلنين والمشترين مباشرة من تفاصيل أي إعلان وستظهر محادثاتك هنا'
+                              : 'Message sellers or buyers directly from any listing to start a conversation here',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppTheme.textMuted,
                             fontSize: 13,
                             height: 1.4,
@@ -118,7 +121,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       final sender = lastMsg['sender'] as Map<String, dynamic>?;
                       final receiver = lastMsg['receiver'] as Map<String, dynamic>?;
                       final partner = otherId == (sender?['id']) ? sender : receiver;
-                      final partnerName = partner?['name'] as String? ?? 'مستخدم كويت سوق #$otherId';
+                      final partnerName = partner?['name'] as String? ?? (isArabic ? 'مستخدم كويت سوق #$otherId' : 'KuwaitSouq User #$otherId');
                       final text = lastMsg['message'] as String? ?? lastMsg['content'] as String? ?? '';
 
                       return ListTile(
@@ -157,7 +160,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                             color: Color(0xFF64748B),
                           ),
                         ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF94A3B8)),
+                        trailing: Icon(isArabic ? Icons.chevron_left : Icons.chevron_right, size: 20, color: const Color(0xFF94A3B8)),
                       );
                     },
                   ),

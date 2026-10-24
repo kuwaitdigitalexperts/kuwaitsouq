@@ -101,11 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleSendOtp({bool isResend = false}) async {
     final rawPhone = _phoneController.text.trim();
+    final isAr = context.isArabic;
     if (rawPhone.isEmpty || rawPhone.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text('Please enter a valid mobile number'),
+          content: Text(isAr ? 'يرجى إدخال رقم هاتف صحيح' : 'Please enter a valid mobile number'),
         ),
       );
       return;
@@ -131,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
               backgroundColor: AppTheme.primaryGreen,
               content: Text(
                 isResend
-                    ? 'OTP resent to $fullPhoneNumber'
-                    : '6-digit OTP sent to $fullPhoneNumber',
+                    ? (isAr ? 'تم إعادة إرسال الرمز إلى $fullPhoneNumber' : 'OTP resent to $fullPhoneNumber')
+                    : (isAr ? 'تم إرسال رمز التحقق (OTP) إلى $fullPhoneNumber' : '6-digit OTP sent to $fullPhoneNumber'),
               ),
             ),
           );
@@ -148,9 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           if (ok) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 backgroundColor: AppTheme.primaryGreen,
-                content: Text('Phone verified automatically! Welcome to KuwaitSouq.'),
+                content: Text(isAr ? 'تم التحقق من الهاتف بنجاح! مرحباً بك في كويت سوق.' : 'Phone verified automatically! Welcome to KuwaitSouq.'),
               ),
             );
             _navigateAfterAuth();
@@ -174,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.redAccent,
-            content: Text('Could not send verification code: $e'),
+            content: Text(isAr ? 'تعذر إرسال رمز التحقق: $e' : 'Could not send verification code: $e'),
           ),
         );
       }
@@ -183,11 +184,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleVerifyOtp() async {
     final otp = _otpController.text.trim();
+    final isAr = context.isArabic;
     if (otp.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text('Please enter the 6-digit OTP received via SMS'),
+          content: Text(isAr ? 'يرجى إدخال رمز التحقق المكون من 6 أرقام' : 'Please enter the 6-digit OTP received via SMS'),
         ),
       );
       return;
@@ -195,9 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (_verificationId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text('Verification session expired. Please request a new OTP.'),
+          content: Text(isAr ? 'انتهت صلاحية جلسة التحقق. يرجى طلب رمز جديد.' : 'Verification session expired. Please request a new OTP.'),
         ),
       );
       return;
@@ -431,7 +433,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Section Heading
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: Text(
                         _isPasswordMode ? context.tr('sign_in_password') : context.tr('login_or_signup'),
                         style: const TextStyle(
@@ -444,7 +446,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 6),
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: Text(
                         _isPasswordMode
                             ? context.tr('enter_password')
@@ -714,7 +716,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'KuwaitSouq • سوق الكويت والخليج العربي',
+                    'KuwaitSouq • سوق الكويت',
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
@@ -723,7 +725,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'سوق الإعلانات المبوبة الأول في الكويت',
+                    context.isArabic
+                        ? 'سوق الإعلانات المبوبة الأول في دولة الكويت'
+                        : "The #1 Classifieds Marketplace in Kuwait",
                     style: TextStyle(
                       fontSize: 11,
                       color: Colors.grey.shade600,
@@ -758,7 +762,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 setState(() => _selectedCountry = selected);
               }
             },
-            borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+            borderRadius: const BorderRadiusDirectional.horizontal(start: Radius.circular(14)).resolve(Directionality.of(context)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: Row(

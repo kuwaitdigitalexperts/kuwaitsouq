@@ -8,6 +8,7 @@ import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/providers/categories_provider.dart';
 import '../../../../core/providers/country_provider.dart';
 import '../../../../core/models/ad_model.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
 
 class CategoryAdsScreen extends StatefulWidget {
@@ -50,7 +51,68 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // Sorting
   String _sortBy = 'newest';
-  String _sortLabel = 'Newest';
+  String? _sortLabel;
+
+  String? get _localizedSelectedLocationName {
+    if (_selectedLocationId == null) return null;
+    try {
+      final loc = _locations.firstWhere((l) => l['id'] == _selectedLocationId, orElse: () => null);
+      if (loc == null) return _selectedLocationName;
+      final isAr = context.isArabic;
+      return isAr ? (loc['name_ar'] ?? loc['name']) : (loc['name'] ?? loc['name_ar']);
+    } catch (_) {
+      return _selectedLocationName;
+    }
+  }
+
+  String? get _localizedPriceLabel {
+    if (_minPrice == null && _maxPrice == null) return null;
+    final isAr = context.isArabic;
+    final curr = isAr ? 'د.ك' : 'KD';
+    if (_minPrice == 0.0 && _maxPrice == 100.0) {
+      return isAr ? 'أقل من 100 $curr' : 'Under 100 $curr';
+    } else if (_minPrice == 100.0 && _maxPrice == 500.0) {
+      return '100 - 500 $curr';
+    } else if (_minPrice == 500.0 && _maxPrice == 1500.0) {
+      return '500 - 1,500 $curr';
+    } else if (_minPrice == 1500.0 && _maxPrice == 5000.0) {
+      return '1,500 - 5,000 $curr';
+    } else if (_minPrice == 5000.0 && _maxPrice == 15000.0) {
+      return '5,000 - 15,000 $curr';
+    } else if (_minPrice == 15000.0) {
+      return isAr ? 'أكثر من 15,000 $curr' : '+15,000 $curr';
+    }
+    return _priceLabel;
+  }
+
+  String _getSortDisplayLabel(bool isAr) {
+    switch (_sortBy) {
+      case 'price_asc':
+        return isAr ? 'الأرخص' : 'Low Price';
+      case 'price_desc':
+        return isAr ? 'الأعلى' : 'High Price';
+      case 'newest':
+      default:
+        return isAr ? 'الأحدث' : 'Newest';
+    }
+  }
+
+  String _getLocalizedFilterValueLabel(String filterKey, String value, bool isAr) {
+    try {
+      final filter = _filters.firstWhere((f) => f['filter_key'] == filterKey, orElse: () => null);
+      if (filter != null && filter['options'] is List) {
+        final opt = (filter['options'] as List).firstWhere(
+          (o) => o['value'] == value,
+          orElse: () => null,
+        );
+        if (opt != null) {
+          final label = isAr ? (opt['label_ar'] ?? opt['label']) : (opt['label'] ?? opt['label_ar']);
+          if (label != null) return label.toString();
+        }
+      }
+    } catch (_) {}
+    return _activeFilterLabels[filterKey] ?? value;
+  }
 
   @override
   void initState() {
@@ -125,6 +187,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
     final adsProvider = context.watch<AdsProvider>();
     final catsProvider = context.watch<CategoriesProvider>();
     final countryProv = context.watch<CountryProvider>();
+    final isAr = context.isArabic;
     final subcategories = catsProvider.childrenOf(widget.categoryId);
     final ads = adsProvider.ads;
 
@@ -176,7 +239,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 child: Row(
                   children: [
                     _buildPillChip(
-                      label: 'All',
+                      label: isAr ? 'الكل' : 'All',
                       isSelected: _selectedSubFilterId == null,
                       onTap: () {
                         setState(() {
@@ -191,10 +254,13 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     const SizedBox(width: 8),
                     ...subcategories.map((sub) {
                       final isSelected = _selectedSubFilterId == sub['id'];
+                      final subName = isAr
+                          ? (sub['name_ar'] ?? sub['name'] ?? '')
+                          : (sub['name'] ?? sub['name_ar'] ?? '');
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: _buildPillChip(
-                          label: sub['name'] ?? '',
+                          label: subName,
                           isSelected: isSelected,
                           onTap: () {
                             setState(() {
@@ -232,7 +298,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
             child: Row(
               children: [
                 Text(
-                  '${ads.length} إعلان في ${countryProv.countryNameAr}',
+                  isAr 
+                      ? '${ads.length} إعلان في ${countryProv.countryName(true)}'
+                      : '${ads.length} ads in ${countryProv.countryName(false)}',
                   style: const TextStyle(
                     color: AppTheme.textMuted,
                     fontSize: 12.5,
@@ -258,7 +326,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                         const Icon(Icons.sort, color: AppTheme.textDark, size: 15),
                         const SizedBox(width: 4),
                         Text(
-                          '$_sortLabel ▾',
+                          '${_getSortDisplayLabel(context.isArabic)} ▾',
                           style: const TextStyle(
                             color: AppTheme.textDark,
                             fontSize: 11.5,
@@ -449,7 +517,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                   SizedBox(
                     width: 68,
                     child: Text(
-                      card['label'] ?? '',
+                      context.isArabic
+                          ? (card['label_ar'] ?? card['label'] ?? '')
+                          : (card['label'] ?? card['label_ar'] ?? ''),
                       maxLines: 2,
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -474,6 +544,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   // Dynamic Filter Pills Row (Location, Price, Condition, Dynamic DB Pills, More)
   // ─────────────────────────────────────────────
   Widget _buildFilterPillsRow() {
+    final isAr = context.isArabic;
     final pinnedFilters = _filters.where((f) => f['is_pinned'] == true || f['is_pinned'] == 1).toList();
 
     return Container(
@@ -486,7 +557,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
           children: [
             // 1. Location Pill
             _buildDropdownPill(
-              label: _selectedLocationName != null ? '$_selectedLocationName' : 'Location',
+              label: _localizedSelectedLocationName != null ? '$_localizedSelectedLocationName' : (isAr ? 'الموقع' : 'Location'),
               isActive: _selectedLocationId != null,
               onTap: _showLocationBottomSheet,
             ),
@@ -494,8 +565,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
             // 2. Price Pill
             _buildDropdownPill(
-              label: _priceLabel ?? 'السعر (KD)',
-              isActive: _priceLabel != null,
+              label: _localizedPriceLabel ?? (isAr ? 'السعر (د.ك)' : 'Price (KD)'),
+              isActive: _minPrice != null || _maxPrice != null,
               onTap: _showPriceBottomSheet,
             ),
             const SizedBox(width: 8),
@@ -503,7 +574,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
             // 3. Dynamic Pinned Category Filters (e.g. Boat Type, Make, Year, Property Type, Condition)
             ...pinnedFilters.map((filter) {
               final filterKey = filter['filter_key'] as String;
-              final filterName = filter['name'] as String;
+              final filterName = isAr
+                  ? (filter['name_ar'] ?? filter['name'] as String)
+                  : (filter['name'] as String);
               final selectedValue = _activeFilters[filterKey];
               final hasSelection = selectedValue != null;
               final displayLabel = hasSelection
@@ -571,7 +644,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   }
 
   Widget _buildMorePill() {
+    final isAr = context.isArabic;
     final nonPinnedCount = _filters.where((f) => f['is_pinned'] != true && f['is_pinned'] != 1).length;
+    final moreLabel = isAr ? 'المزيد' : 'More';
     return InkWell(
       onTap: _showMoreFiltersBottomSheet,
       borderRadius: BorderRadius.circular(20),
@@ -588,7 +663,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
             const Icon(Icons.tune_rounded, size: 14, color: AppTheme.textDark),
             const SizedBox(width: 4),
             Text(
-              nonPinnedCount > 0 ? 'More ($nonPinnedCount)' : 'More',
+              nonPinnedCount > 0 ? '$moreLabel ($nonPinnedCount)' : moreLabel,
               style: const TextStyle(
                 color: AppTheme.textDark,
                 fontSize: 12,
@@ -605,6 +680,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   // Active Filter Chips
   // ─────────────────────────────────────────────
   Widget _buildActiveFilterChips() {
+    final isAr = context.isArabic;
     return Container(
       color: AppTheme.surfaceWhite,
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
@@ -615,11 +691,11 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
             // Reset All button
             InkWell(
               onTap: _resetAllFilters,
-              child: const Padding(
-                padding: EdgeInsets.only(right: 8),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
                 child: Text(
-                  'Clear All',
-                  style: TextStyle(
+                  isAr ? 'مسح الكل' : 'Clear All',
+                  style: const TextStyle(
                     color: AppTheme.accentOrange,
                     fontSize: 11.5,
                     fontWeight: FontWeight.bold,
@@ -628,9 +704,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
               ),
             ),
 
-            if (_selectedLocationName != null)
+            if (_selectedLocationId != null)
               _buildFilterBadgeChip(
-                label: 'Location: $_selectedLocationName',
+                label: '${isAr ? "الموقع" : "Location"}: ${_localizedSelectedLocationName ?? ""}',
                 onRemove: () {
                   setState(() {
                     _selectedLocationId = null;
@@ -640,9 +716,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 },
               ),
 
-            if (_priceLabel != null)
+            if (_minPrice != null || _maxPrice != null)
               _buildFilterBadgeChip(
-                label: 'Price: $_priceLabel',
+                label: '${isAr ? "السعر" : "Price"}: ${_localizedPriceLabel ?? ""}',
                 onRemove: () {
                   setState(() {
                     _minPrice = null;
@@ -655,7 +731,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
             if (_selectedCondition != null)
               _buildFilterBadgeChip(
-                label: 'Condition: ${_selectedCondition!.toUpperCase()}',
+                label: '${isAr ? "الحالة" : "Condition"}: ${_selectedCondition == "new" ? (isAr ? "جديد كلياً" : "Brand New") : (_selectedCondition == "used" ? (isAr ? "مستعمل" : "Used") : (isAr ? "مجدد" : "Reconditioned"))}',
                 onRemove: () {
                   setState(() => _selectedCondition = null);
                   _applyFilters();
@@ -664,7 +740,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
             ..._activeFilters.entries.map((entry) {
               final key = entry.key;
-              final humanLabel = _activeFilterLabels[key] ?? entry.value;
+              final humanLabel = _getLocalizedFilterValueLabel(key, entry.value, isAr);
               return _buildFilterBadgeChip(
                 label: humanLabel,
                 onRemove: () {
@@ -719,7 +795,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   // 1. Dynamic DB Filter Options Sheet
   void _showFilterOptionsBottomSheet(Map<String, dynamic> filter) {
     final filterKey = filter['filter_key'] as String;
-    final filterName = filter['name'] as String;
+    final isAr = context.isArabic;
+    final filterName = isAr ? (filter['name_ar'] ?? filter['name'] as String) : (filter['name'] as String);
     final options = (filter['options'] as List?) ?? [];
     final currentSelection = _activeFilters[filterKey];
 
@@ -761,7 +838,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                           Navigator.pop(context);
                           _applyFilters();
                         },
-                        child: const Text('Reset', style: TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
+                        child: Text(isAr ? 'إعادة ضبط' : 'Reset', style: const TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
                       ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
@@ -782,7 +859,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     if (index == 0) {
                       final isAll = currentSelection == null;
                       return ListTile(
-                        title: const Text('All', style: TextStyle(fontSize: 14)),
+                        title: Text(isAr ? 'الكل' : 'All', style: const TextStyle(fontSize: 14)),
                         trailing: isAll ? const Icon(Icons.check, color: AppTheme.primaryGreen) : null,
                         onTap: () {
                           setState(() {
@@ -797,7 +874,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
                     final opt = options[index - 1];
                     final optValue = opt['value'] as String;
-                    final optLabel = opt['label'] as String;
+                    final optLabel = isAr ? (opt['label_ar'] ?? opt['label'] as String) : (opt['label'] as String);
                     final isSelected = currentSelection == optValue;
 
                     return ListTile(
@@ -843,6 +920,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // 2. Location Bottom Sheet
   void _showLocationBottomSheet() {
+    final isAr = context.isArabic;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -861,9 +939,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
                 child: Row(
                   children: [
-                    const Text(
-                      'مناطق ومحافظات الكويت (Kuwait Locations)',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                    Text(
+                      isAr ? 'مناطق ومحافظات الكويت' : 'Kuwait Locations & Areas',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                     ),
                     const Spacer(),
                     if (_selectedLocationId != null)
@@ -876,7 +954,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                           Navigator.pop(context);
                           _applyFilters();
                         },
-                        child: const Text('كل الكويت', style: TextStyle(color: Color(0xFF2563EB), fontSize: 13, fontWeight: FontWeight.bold)),
+                        child: Text(isAr ? 'كل الكويت' : 'All Kuwait', style: const TextStyle(color: Color(0xFF2563EB), fontSize: 13, fontWeight: FontWeight.bold)),
                       ),
                     IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(context)),
                   ],
@@ -893,7 +971,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                       final isSelected = _selectedLocationId == null;
                       return ListTile(
                         leading: const Icon(Icons.map_outlined, color: Color(0xFF2563EB)),
-                        title: const Text('كل الكويت (All Kuwait)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        title: Text(isAr ? 'كل الكويت' : 'All Kuwait', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                         trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF2563EB)) : null,
                         onTap: () {
                           setState(() {
@@ -906,15 +984,16 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                       );
                     }
                     final loc = _locations[index - 1];
+                    final locName = isAr ? (loc['name_ar'] ?? loc['name'] ?? '') : (loc['name'] ?? loc['name_ar'] ?? '');
                     final isSelected = _selectedLocationId == loc['id'];
                     return ListTile(
                       leading: const Icon(Icons.location_on_outlined, color: AppTheme.textMuted, size: 20),
-                      title: Text(loc['name'] ?? '', style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
+                      title: Text(locName, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
                       trailing: isSelected ? const Icon(Icons.check, color: AppTheme.primaryGreen) : null,
                       onTap: () {
                         setState(() {
                           _selectedLocationId = loc['id'] as int;
-                          _selectedLocationName = loc['name'] as String;
+                          _selectedLocationName = loc['name'] as String?;
                         });
                         Navigator.pop(context);
                         _applyFilters();
@@ -932,13 +1011,15 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // 3. Price Bottom Sheet
   void _showPriceBottomSheet() {
+    final isAr = context.isArabic;
+    final curr = isAr ? 'د.ك' : 'KD';
     final priceRanges = [
-      {'label': 'أقل من 100 د.ك (Under 100 KD)', 'min': 0.0, 'max': 100.0},
-      {'label': '100 - 500 د.ك', 'min': 100.0, 'max': 500.0},
-      {'label': '500 - 1,500 د.ك', 'min': 500.0, 'max': 1500.0},
-      {'label': '1,500 - 5,000 د.ك', 'min': 1500.0, 'max': 5000.0},
-      {'label': '5,000 - 15,000 د.ك', 'min': 5000.0, 'max': 15000.0},
-      {'label': 'أكثر من 15,000 د.ك (+15,000 KD)', 'min': 15000.0, 'max': 1000000.0},
+      {'label': isAr ? 'أقل من 100 $curr' : 'Under 100 $curr', 'min': 0.0, 'max': 100.0},
+      {'label': '100 - 500 $curr', 'min': 100.0, 'max': 500.0},
+      {'label': '500 - 1,500 $curr', 'min': 500.0, 'max': 1500.0},
+      {'label': '1,500 - 5,000 $curr', 'min': 1500.0, 'max': 5000.0},
+      {'label': '5,000 - 15,000 $curr', 'min': 5000.0, 'max': 15000.0},
+      {'label': isAr ? 'أكثر من 15,000 $curr' : '+15,000 $curr', 'min': 15000.0, 'max': 1000000.0},
     ];
 
     showModalBottomSheet(
@@ -957,9 +1038,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
                 child: Row(
                   children: [
-                    const Text('نطاق السعر (Price Range - KD)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(isAr ? 'نطاق السعر ($curr)' : 'Price Range ($curr)', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const Spacer(),
-                    if (_priceLabel != null)
+                    if (_minPrice != null || _maxPrice != null)
                       TextButton(
                         onPressed: () {
                           setState(() {
@@ -970,7 +1051,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                           Navigator.pop(context);
                           _applyFilters();
                         },
-                        child: const Text('Reset', style: TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
+                        child: Text(isAr ? 'إعادة ضبط' : 'Reset', style: const TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
                       ),
                     IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(context)),
                   ],
@@ -978,7 +1059,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
               ),
               const Divider(height: 1),
               ...priceRanges.map((range) {
-                final isSelected = _priceLabel == range['label'];
+                final isSelected = _minPrice == range['min'] && _maxPrice == range['max'];
                 return ListTile(
                   title: Text(range['label'] as String, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
                   trailing: isSelected ? const Icon(Icons.check, color: AppTheme.primaryGreen) : null,
@@ -1003,7 +1084,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // 4. More Filters Bottom Sheet
   void _showMoreFiltersBottomSheet() {
-    final nonPinnedFilters = _filters.where((f) => f['is_pinned'] != true && f['is_pinned'] != 1).toList();
+    final isAr = context.isArabic;
+    final curr = isAr ? 'د.ك' : 'KD';
 
     showModalBottomSheet(
       context: context,
@@ -1023,14 +1105,14 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
                 child: Row(
                   children: [
-                    const Text('All Filters', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(isAr ? 'جميع الفلاتر' : 'All Filters', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const Spacer(),
                     TextButton(
                       onPressed: () {
                         _resetAllFilters();
                         Navigator.pop(context);
                       },
-                      child: const Text('Reset All', style: TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
+                      child: Text(isAr ? 'إعادة ضبط الكل' : 'Reset All', style: const TextStyle(color: AppTheme.accentOrange, fontSize: 13)),
                     ),
                     IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(context)),
                   ],
@@ -1045,8 +1127,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     // Location
                     ListTile(
                       leading: const Icon(Icons.location_on_outlined, color: Color(0xFF2563EB)),
-                      title: const Text('المنطقة (Location)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      subtitle: Text(_selectedLocationName ?? 'كل الكويت (All Kuwait)', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                      title: Text(isAr ? 'المنطقة' : 'Location', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      subtitle: Text(_localizedSelectedLocationName ?? (isAr ? 'كل الكويت' : 'All Kuwait'), style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.pop(context);
@@ -1058,8 +1140,8 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     // Price
                     ListTile(
                       leading: const Icon(Icons.payments_outlined, color: Color(0xFF2563EB)),
-                      title: const Text('السعر (Price Range - KD)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      subtitle: Text(_priceLabel ?? 'الكل (Any price)', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                      title: Text(isAr ? 'السعر ($curr)' : 'Price Range ($curr)', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      subtitle: Text(_localizedPriceLabel ?? (isAr ? 'أي سعر' : 'Any price'), style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.pop(context);
@@ -1071,8 +1153,17 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     // Condition
                     ListTile(
                       leading: const Icon(Icons.verified_outlined, color: AppTheme.primaryGreen),
-                      title: const Text('Condition', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      subtitle: Text(_selectedCondition?.toUpperCase() ?? 'All', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                      title: Text(isAr ? 'الحالة' : 'Condition', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        _selectedCondition != null
+                            ? (_selectedCondition == 'new'
+                                ? (isAr ? 'جديد كلياً' : 'Brand New')
+                                : (_selectedCondition == 'used'
+                                    ? (isAr ? 'مستعمل' : 'Used')
+                                    : (isAr ? 'مجدد' : 'Reconditioned')))
+                            : (isAr ? 'الكل' : 'All'),
+                        style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.pop(context);
@@ -1084,8 +1175,10 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     // Dynamic filters from backend
                     ..._filters.map((filter) {
                       final filterKey = filter['filter_key'] as String;
-                      final filterName = filter['name'] as String;
-                      final selectedVal = _activeFilterLabels[filterKey] ?? 'Any';
+                      final filterName = isAr ? (filter['name_ar'] ?? filter['name'] as String) : (filter['name'] as String);
+                      final selectedVal = _activeFilters.containsKey(filterKey)
+                          ? _getLocalizedFilterValueLabel(filterKey, _activeFilters[filterKey]!, isAr)
+                          : (isAr ? 'الكل' : 'Any');
 
                       return Column(
                         mainAxisSize: MainAxisSize.min,
@@ -1116,11 +1209,12 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // 5. Condition Bottom Sheet
   void _showConditionBottomSheet() {
+    final isAr = context.isArabic;
     final conditions = [
-      {'label': 'All Conditions', 'val': null},
-      {'label': 'Brand New', 'val': 'new'},
-      {'label': 'Used', 'val': 'used'},
-      {'label': 'Reconditioned', 'val': 'reconditioned'},
+      {'label': isAr ? 'جميع الحالات' : 'All Conditions', 'val': null},
+      {'label': isAr ? 'جديد كلياً' : 'Brand New', 'val': 'new'},
+      {'label': isAr ? 'مستعمل' : 'Used', 'val': 'used'},
+      {'label': isAr ? 'مجدد' : 'Reconditioned', 'val': 'reconditioned'},
     ];
 
     showModalBottomSheet(
@@ -1139,7 +1233,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
                 child: Row(
                   children: [
-                    const Text('Item Condition', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(isAr ? 'حالة السلعة' : 'Item Condition', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const Spacer(),
                     IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(context)),
                   ],
@@ -1168,10 +1262,11 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // 6. Sort Bottom Sheet
   void _showSortBottomSheet() {
+    final isAr = context.isArabic;
     final sortOptions = [
-      {'label': 'Newest First', 'key': 'newest'},
-      {'label': 'Price: Low to High', 'key': 'price_asc'},
-      {'label': 'Price: High to Low', 'key': 'price_desc'},
+      {'label': isAr ? 'الأحدث أولاً' : 'Newest First', 'short': isAr ? 'الأحدث' : 'Newest', 'key': 'newest'},
+      {'label': isAr ? 'السعر: من الأقل للأعلى' : 'Price: Low to High', 'short': isAr ? 'الأرخص' : 'Low Price', 'key': 'price_asc'},
+      {'label': isAr ? 'السعر: من الأعلى للأقل' : 'Price: High to Low', 'short': isAr ? 'الأعلى' : 'High Price', 'key': 'price_desc'},
     ];
 
     showModalBottomSheet(
@@ -1190,7 +1285,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
                 child: Row(
                   children: [
-                    const Text('Sort Ads By', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(isAr ? 'ترتيب الإعلانات حسب' : 'Sort Ads By', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const Spacer(),
                     IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(context)),
                   ],
@@ -1205,7 +1300,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                   onTap: () {
                     setState(() {
                       _sortBy = opt['key'] as String;
-                      _sortLabel = (opt['label'] as String).split(' ').first;
+                      _sortLabel = opt['short'] as String;
                     });
                     Navigator.pop(context);
                     _applyFilters();
@@ -1224,6 +1319,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   // Empty State & Grid / List Cards
   // ─────────────────────────────────────────────
   Widget _buildEmptyState() {
+    final isAr = context.isArabic;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -1244,7 +1340,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No ads found in ${widget.categoryName}',
+              isAr ? 'لا توجد إعلانات في ${widget.categoryName}' : 'No ads found in ${widget.categoryName}',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppTheme.textDark,
@@ -1253,10 +1349,12 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              'حاول تعديل خيارات البحث أو كن أول من يضيف إعلاناً في الكويت والخليج!',
+            Text(
+              isAr
+                  ? 'حاول تعديل خيارات البحث أو كن أول من يضيف إعلاناً في الكويت!'
+                  : 'Try adjusting your search filters or be the first to post an ad in Kuwait!',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppTheme.textMuted,
                 fontSize: 13,
               ),
@@ -1272,13 +1370,13 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     side: const BorderSide(color: AppTheme.borderLight),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Clear Filters'),
+                  child: Text(isAr ? 'مسح الفلاتر' : 'Clear Filters'),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
                   onPressed: () => context.push('/post-ad'),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Post Your Ad'),
+                  label: Text(isAr ? 'أضف إعلانك' : 'Post Your Ad'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGreen,
                     foregroundColor: Colors.white,
@@ -1325,8 +1423,12 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   }
 
   Widget _buildGridCard(AdModel ad) {
-    final fmt = NumberFormat.currency(locale: 'ar_KW', symbol: '${ad.currency} ', decimalDigits: 0);
-    final locationText = ad.locationName.isNotEmpty ? ad.locationName : 'مدينة الكويت (Kuwait)';
+    final isAr = context.isArabic;
+    final currency = ad.localizedCurrency(isAr);
+    final fmt = NumberFormat.currency(locale: isAr ? 'ar_KW' : 'en_KW', symbol: '$currency ', decimalDigits: 0);
+    final location = ad.localizedLocation(isAr);
+    final locationText = location.isNotEmpty ? location : (isAr ? 'مدينة الكويت' : 'Kuwait City');
+    final titleText = ad.localizedTitle(isAr);
 
     return InkWell(
       onTap: () => context.push('/ads/${ad.id}'),
@@ -1377,9 +1479,9 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                         color: AppTheme.accentOrange,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'FEATURED',
-                        style: TextStyle(
+                      child: Text(
+                        isAr ? 'مميز' : 'FEATURED',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 8.5,
                           fontWeight: FontWeight.bold,
@@ -1418,7 +1520,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    ad.title,
+                    titleText,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1455,8 +1557,12 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
   }
 
   Widget _buildListCard(AdModel ad) {
-    final fmt = NumberFormat.currency(locale: 'ar_KW', symbol: '${ad.currency} ', decimalDigits: 0);
-    final locationText = ad.locationName.isNotEmpty ? ad.locationName : 'مدينة الكويت (Kuwait)';
+    final isAr = context.isArabic;
+    final currency = ad.localizedCurrency(isAr);
+    final fmt = NumberFormat.currency(locale: isAr ? 'ar_KW' : 'en_KW', symbol: '$currency ', decimalDigits: 0);
+    final location = ad.localizedLocation(isAr);
+    final locationText = location.isNotEmpty ? location : (isAr ? 'مدينة الكويت' : 'Kuwait City');
+    final titleText = ad.localizedTitle(isAr);
 
     return InkWell(
       onTap: () => context.push('/ads/${ad.id}'),
@@ -1506,7 +1612,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          ad.title,
+                          titleText,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(

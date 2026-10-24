@@ -102,23 +102,9 @@
 <div class="bg-white p-4 sm:rounded-2xl border border-slate-200/80 mb-4 shadow-xs">
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         @foreach($subcategories as $sub)
-            <a href="{{ route('category.show', $sub->slug) }}" class="flex flex-col sm:flex-row items-center gap-3 p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition group text-center sm:text-start">
-                <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-blue-600 text-lg border border-slate-100 group-hover:scale-105 transition flex-shrink-0">
-                    @if(Str::contains($sub->slug, 'cars-for-sale'))
-                        <i class="fa-solid fa-car"></i>
-                    @elseif(Str::contains($sub->slug, 'accessories'))
-                        <i class="fa-solid fa-car-burst"></i>
-                    @elseif(Str::contains($sub->slug, 'rent'))
-                        <i class="fa-solid fa-key"></i>
-                    @elseif(Str::contains($sub->slug, 'heavy'))
-                        <i class="fa-solid fa-truck-monster"></i>
-                    @elseif(Str::contains($sub->slug, 'spare'))
-                        <i class="fa-solid fa-gear"></i>
-                    @elseif(Str::contains($sub->slug, 'plate'))
-                        <i class="fa-solid fa-id-card"></i>
-                    @else
-                        <i class="fa-solid fa-motorcycle"></i>
-                    @endif
+            <a href="{{ route('category.show', $sub->slug) }}" class="flex flex-col sm:flex-row items-center gap-3 p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition group text-center sm:text-start shadow-xs">
+                <div class="w-12 h-12 rounded-2xl bg-white shadow-xs flex items-center justify-center border border-slate-100 p-1 group-hover:scale-105 transition flex-shrink-0">
+                    <img src="{{ $sub->icon_url }}" alt="{{ $sub->display_name }}" class="w-10 h-10 object-contain" onerror="this.onerror=null;this.src='{{ $category->icon_url }}';">
                 </div>
                 <div class="flex-1 min-w-0">
                     <span class="text-xs font-bold text-slate-800 block truncate group-hover:text-blue-600">{{ $sub->display_name }}</span>

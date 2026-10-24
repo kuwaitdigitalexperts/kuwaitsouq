@@ -48,9 +48,11 @@ class RecommendedSection extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textDark),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'كن أول من يضيف إعلاناً في سوق الكويت (KuwaitSouq)!',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                  Text(
+                    context.isArabic
+                        ? 'كن أول من يضيف إعلاناً في سوق الكويت!'
+                        : 'Be the first to post an ad in KuwaitSouq!',
+                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
@@ -77,13 +79,12 @@ class RecommendedSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section Header: "সাম্প্রতিক বিজ্ঞাপন" + "সব দেখুন >"
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Trending',
-                style: TextStyle(
+              Text(
+                context.isArabic ? 'شائع الآن' : 'Trending',
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E2923),
@@ -139,14 +140,20 @@ class RecommendedSection extends StatelessWidget {
   }
 
   Widget _buildLiveAdCard(BuildContext context, dynamic ad) {
-    final currency = context.tr('currency_symbol');
-    final formattedPrice = '$currency ${ad.price?.toStringAsFixed(0) ?? '0'}';
+    final isAr = context.isArabic;
+    final currency = (ad is AdModel) ? ad.localizedCurrency(isAr) : (isAr ? 'د.ك' : 'KD');
+    final formattedPrice = (ad is AdModel)
+        ? '${ad.price.toStringAsFixed(ad.price.truncateToDouble() == ad.price ? 0 : 2)} $currency'
+        : '${ad.price?.toStringAsFixed(0) ?? '0'} $currency';
     final String? imageUrl = (ad is AdModel)
         ? ad.primaryImageUrl
         : (ad.images != null && (ad.images as List).isNotEmpty ? (ad.images as List).first as String? : null);
     final String locationText = (ad is AdModel)
-        ? (ad.locationName.isNotEmpty ? ad.locationName : context.tr('all_districts'))
-        : (ad.location is String ? ad.location as String : context.tr('all_districts'));
+        ? ad.localizedLocation(isAr)
+        : (ad.location is String ? ad.location as String : (isAr ? 'الكويت' : 'Kuwait'));
+    final String titleText = (ad is AdModel)
+        ? ad.localizedTitle(isAr)
+        : (ad.title ?? (isAr ? 'إعلان' : 'Ad'));
 
     return InkWell(
       onTap: () => context.push('/ads/${ad.id}'),
@@ -230,7 +237,7 @@ class RecommendedSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    ad.title ?? 'Ad',
+                    titleText,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

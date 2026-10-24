@@ -23,22 +23,25 @@
                 <span>{{ ($isRtl ?? true) ? 'الموقع الجغرافي (الدولة والمدينة)' : 'Location' }}</span>
             </h2>
 
+            <input type="hidden" name="country_id" value="{{ $kuwait->id ?? 1 }}">
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1">{{ ($isRtl ?? true) ? 'الدولة' : 'Country' }}</label>
-                    <select name="country_id" id="countrySelect" onchange="loadCities(this.value)" required class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-2.5 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-400">
-                        @foreach($countries as $c)
-                            <option value="{{ $c->id }}" {{ ($currentCountry->id ?? null) === $c->id ? 'selected' : '' }}>
-                                {{ $c->flag }} {{ $c->display_name }} ({{ $c->display_currency }})
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="w-full bg-slate-100 border border-slate-200 rounded-xl py-2 px-2.5 text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <span>🇰🇼</span>
+                        <span>{{ ($isRtl ?? true) ? 'الكويت' : 'Kuwait' }} (KWD)</span>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1">{{ ($isRtl ?? true) ? 'المدينة' : 'City' }}</label>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">{{ ($isRtl ?? true) ? 'المنطقة / المحافظة' : 'Area / Governorate' }} *</label>
                     <select name="city_id" id="citySelect" required class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-2.5 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-400">
-                        <!-- Populated by JS -->
+                        <option value="">{{ ($isRtl ?? true) ? '-- اختر المنطقة --' : '-- Select Area --' }}</option>
+                        @foreach($cities as $city)
+                            <option value="{{ $city->id }}">
+                                {{ ($isRtl ?? true) ? $city->name_ar : $city->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -181,22 +184,6 @@
 
 @push('scripts')
 <script>
-    function loadCities(countryId) {
-        fetch(`/api/countries/${countryId}/cities`)
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById('citySelect');
-                select.innerHTML = '';
-                data.cities.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.display_name;
-                    select.appendChild(opt);
-                });
-                document.getElementById('currencyBadge').textContent = data.country.currency;
-            });
-    }
-
     function updateSubcategories(select) {
         const selected = select.options[select.selectedIndex];
         const subsData = selected.getAttribute('data-subs');
@@ -218,12 +205,6 @@
             }
         }
         subGroup.classList.add('hidden');
-    }
-
-    // Initial load
-    const initialCountry = document.getElementById('countrySelect').value;
-    if (initialCountry) {
-        loadCities(initialCountry);
     }
 </script>
 @endpush

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/country_city_picker_modal.dart';
 
@@ -16,10 +17,24 @@ class HomeHeader extends StatelessWidget {
     required this.onLocationChanged,
   });
 
+  String _formatCity(String? city, bool isAr) {
+    if (city == null) return isAr ? 'الكل' : 'All';
+    final match = RegExp(r'^(.*?)\s*\((.*?)\)$').firstMatch(city);
+    if (match != null) {
+      return isAr ? match.group(1)!.trim() : match.group(2)!.trim();
+    }
+    return city;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final countryNameAr = currentCountry['name_ar'] as String? ?? 'الكويت';
+    final isAr = context.isArabic;
+    final countryName = isAr
+        ? (currentCountry['name_ar'] as String? ?? 'الكويت')
+        : (currentCountry['name'] as String? ?? 'Kuwait');
     final flag = currentCountry['flag'] as String? ?? '🇰🇼';
+    final displayCity = _formatCity(currentCity, isAr);
+    final citySuffix = currentCity != null ? " • $displayCity" : "";
 
     return Container(
       decoration: const BoxDecoration(
@@ -52,16 +67,16 @@ class HomeHeader extends StatelessWidget {
                       child: TextField(
                         onSubmitted: onSearch,
                         textInputAction: TextInputAction.search,
-                        textAlign: TextAlign.right,
-                        decoration: const InputDecoration(
-                          hintText: 'ابحث في سوق الكويت...',
-                          hintStyle: TextStyle(
+                        textAlign: isAr ? TextAlign.right : TextAlign.left,
+                        decoration: InputDecoration(
+                          hintText: context.tr('search_in_kuwaitsouq'),
+                          hintStyle: const TextStyle(
                             color: Color(0xFF94A3B8),
                             fontSize: 12.5,
                           ),
-                          prefixIcon: Icon(Icons.search, color: Color(0xFF94A3B8), size: 20),
+                          prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8), size: 20),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         ),
                       ),
                     ),
@@ -76,7 +91,7 @@ class HomeHeader extends StatelessWidget {
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('تم نسخ رابط المشاركة')),
+                        SnackBar(content: Text(context.tr('share_copied'))),
                       );
                     },
                   ),
@@ -132,7 +147,7 @@ class HomeHeader extends StatelessWidget {
                   // Title: All Listings in Country
                   Expanded(
                     child: Text(
-                      'جميع الإعلانات في $countryNameAr ${currentCity != null ? "• $currentCity" : ""}',
+                      '${context.tr('all_ads_in')} $countryName$citySuffix',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -167,7 +182,7 @@ class HomeHeader extends StatelessWidget {
                           Text(flag, style: const TextStyle(fontSize: 14)),
                           const SizedBox(width: 4),
                           Text(
-                            currentCity ?? 'الكل',
+                            displayCity,
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,

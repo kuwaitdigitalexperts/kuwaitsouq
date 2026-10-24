@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Country;
+use App\Models\City;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 
@@ -19,35 +20,31 @@ class LocaleAndCountryMiddleware
         // 1. Locale handling
         $locale = session('locale');
         if (!$locale) {
-            $locale = 'ar'; // Default to Arabic for Gulf countries
+            $locale = 'ar'; // Default to Arabic for Kuwait
             session(['locale' => $locale]);
         }
         App::setLocale($locale);
 
-        // 2. Country handling
-        $countryId = session('country_id');
-        $currentCountry = null;
+        // 2. Kuwait-Only Country handling
+        $currentCountry = Country::where('code', 'KW')->first()
+            ?? Country::where('is_active', true)->first();
 
-        if ($countryId) {
-            $currentCountry = Country::where('is_active', true)->find($countryId);
+        if ($currentCountry) {
+            session(['country_id' => $currentCountry->id]);
         }
 
-        if (!$currentCountry) {
-            // Default to Saudi Arabia if URL has SA or default to Kuwait
-            $currentCountry = Country::where('is_active', true)->where('is_default', true)->first()
-                ?? Country::where('is_active', true)->first();
-            if ($currentCountry) {
-                session(['country_id' => $currentCountry->id]);
-            }
-        }
-
-        $allCountries = Country::where('is_active', true)->orderBy('pos')->get();
+        // Active Kuwait areas/cities for navigation and filters
+        $allCities = City::where('country_id', $currentCountry->id ?? 1)
+            ->where('is_active', true)
+            ->orderBy('pos')
+            ->get();
 
         // Share globally with all Blade views
         View::share('currentLocale', $locale);
         View::share('isRtl', $locale === 'ar');
         View::share('currentCountry', $currentCountry);
-        View::share('allCountries', $allCountries);
+        View::share('allCountries', collect([$currentCountry]));
+        View::share('allCities', $allCities);
 
         return $next($request);
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 
 class PromoPills extends StatelessWidget {
@@ -6,6 +7,8 @@ class PromoPills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = context.isArabic;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
@@ -28,9 +31,11 @@ class PromoPills extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Buy Local\nSell Local\nGrow Together',
-                    style: TextStyle(
+                  Text(
+                    isAr
+                        ? 'بيع محلياً\nواشترِ محلياً\nمع كويت سوق'
+                        : 'Buy Local\nSell Local\nGrow Together',
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.textDark,
@@ -44,9 +49,11 @@ class PromoPills extends StatelessWidget {
                       color: const Color(0xFF2563EB),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
-                      "سوق الكويت الأول • Kuwait's No.1 Marketplace",
-                      style: TextStyle(
+                    child: Text(
+                      isAr
+                          ? 'سوق الكويت الأول'
+                          : "Kuwait's No.1 Marketplace",
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -56,8 +63,8 @@ class PromoPills extends StatelessWidget {
                 ],
               ),
             ),
-            Positioned(
-              right: 10,
+            PositionedDirectional(
+              end: 10,
               bottom: 0,
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(

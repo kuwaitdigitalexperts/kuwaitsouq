@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
 
 class StoriesCarousel extends StatelessWidget {
@@ -14,7 +15,7 @@ class StoriesCarousel extends StatelessWidget {
     },
     {
       'name': 'أبو فهد',
-      'subtitle': 'سيارات',
+      'subtitle': 'Abu Fahad',
       'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
       'color': Color(0xFF10B981),
     },
@@ -26,13 +27,13 @@ class StoriesCarousel extends StatelessWidget {
     },
     {
       'name': 'عقارات حولي',
-      'subtitle': 'Real Estate',
+      'subtitle': 'Hawally Estates',
       'avatar': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150',
       'color': Color(0xFF8B5CF6),
     },
     {
       'name': 'سكوتر شوب',
-      'subtitle': 'Scooters',
+      'subtitle': 'Scooter Shop',
       'avatar': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=150',
       'color': Color(0xFFEF4444),
     },
@@ -40,6 +41,8 @@ class StoriesCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = context.isArabic;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -108,9 +111,9 @@ class StoriesCarousel extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'قصتك',
-                      style: TextStyle(
+                    Text(
+                      context.tr('your_story'),
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.textDark,
@@ -123,11 +126,14 @@ class StoriesCarousel extends StatelessWidget {
 
             final story = stories[index - 1];
             final Color ringColor = story['color'] as Color;
+            final storyName = isAr
+                ? (story['name'] as String)
+                : (story['subtitle'] as String? ?? story['name'] as String);
 
             return InkWell(
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('عرض قصة ${story['name']}')),
+                  SnackBar(content: Text(storyName)),
                 );
               },
               child: Column(
@@ -158,7 +164,7 @@ class StoriesCarousel extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    story['name'] as String,
+                    storyName,
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,

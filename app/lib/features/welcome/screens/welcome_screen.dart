@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/kuwaitsouq_logo.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.isArabic;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       body: Stack(
@@ -55,20 +58,20 @@ class WelcomeScreen extends StatelessWidget {
                       children: [
                         _buildFeatureRow(
                           icon: Icons.directions_car_filled,
-                          title: 'حراج السيارات والمركبات',
-                          subtitle: 'عروض حصرية وفحص كايشها الفوري',
+                          title: isArabic ? 'حراج السيارات والمركبات' : 'Cars & Vehicles Market',
+                          subtitle: isArabic ? 'عروض حصرية وفحص كايشها الفوري' : 'Exclusive deals & instant Kayishha inspection',
                         ),
                         const Divider(color: Colors.white12, height: 24),
                         _buildFeatureRow(
                           icon: Icons.apartment,
-                          title: 'عقارات، أجهزة، ووظائف',
-                          subtitle: 'آلاف الإعلانات المتجددة يومياً',
+                          title: isArabic ? 'عقارات، أجهزة، ووظائف' : 'Real Estate, Electronics & Jobs',
+                          subtitle: isArabic ? 'آلاف الإعلانات المتجددة يومياً' : 'Thousands of new listings updated daily',
                         ),
                         const Divider(color: Colors.white12, height: 24),
                         _buildFeatureRow(
                           icon: Icons.chat_bubble_outline,
-                          title: 'تواصل مباشر وفوري',
-                          subtitle: 'محادثة مباشرة واتصال وواتساب بنقرة واحدة',
+                          title: isArabic ? 'تواصل مباشر وفوري' : 'Instant Direct Contact',
+                          subtitle: isArabic ? 'محادثة مباشرة واتصال وواتساب بنقرة واحدة' : 'Live chat, phone call & WhatsApp in one tap',
                         ),
                       ],
                     ),
@@ -76,16 +79,18 @@ class WelcomeScreen extends StatelessWidget {
 
                   const Spacer(),
 
-                  // GCC Flags Badge
+                  // Kuwait Areas Badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      '🇰🇼 الكويت • 🇸🇦 السعودية • 🇦🇪 الإمارات • 🇶🇦 قطر • 🇧🇭 البحرين • 🇴🇲 عُمان',
-                      style: TextStyle(
+                    child: Text(
+                      isArabic
+                          ? '🇰🇼 سوق الكويت • جميع المناطق والمحافظات'
+                          : '🇰🇼 Kuwait Souq • All Areas & Governorates',
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -109,18 +114,18 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () => context.go('/'),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'ابدأ التصفح الآن (Explore KuwaitSouq)',
-                            style: TextStyle(
+                            isArabic ? 'ابدأ التصفح الآن' : 'Start Exploring Now',
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_rounded, size: 20),
+                          const SizedBox(width: 8),
+                          Icon(isArabic ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded, size: 20),
                         ],
                       ),
                     ),
@@ -141,9 +146,9 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () => context.push('/login'),
-                      child: const Text(
-                        'تسجيل الدخول / إنشاء حساب',
-                        style: TextStyle(
+                      child: Text(
+                        isArabic ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Register',
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

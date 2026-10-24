@@ -10,56 +10,55 @@ use Illuminate\Http\Request;
 
 class CityAdminController extends Controller
 {
+    /**
+     * Display all Kuwait governorates & areas
+     */
     public function index(Request $request)
     {
-        $countryId = $request->query('country_id');
-        $query = City::with(['country', 'neighborhoods'])->withCount('ads');
+        $kuwait = Country::where('code', 'KW')->first();
+        $countryId = $kuwait ? $kuwait->id : 1;
 
-        if ($countryId) {
-            $query->where('country_id', $countryId);
-        }
+        $cities = City::where('country_id', $countryId)
+            ->with(['neighborhoods'])
+            ->withCount('ads')
+            ->orderBy('pos')
+            ->paginate(30);
 
-        $cities = $query->orderBy('pos')->paginate(20)->withQueryString();
-        $countries = Country::orderBy('pos')->get();
-
-        return view('admin.cities.index', compact('cities', 'countries', 'countryId'));
+        return view('admin.cities.index', compact('cities', 'countryId'));
     }
 
-    public function create()
-    {
-        $countries = Country::orderBy('pos')->get();
-        return view('admin.cities.create', compact('countries'));
-    }
-
+    /**
+     * Store a new Kuwait location/area
+     */
     public function store(Request $request)
     {
+        $kuwait = Country::where('code', 'KW')->first();
+        $countryId = $kuwait ? $kuwait->id : 1;
+
         $validated = $request->validate([
-            'country_id' => 'required|exists:countries,id',
             'name' => 'required|string|max:100',
             'name_ar' => 'required|string|max:100',
             'pos' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
 
+        $validated['country_id'] = $countryId;
         $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['pos'] = $validated['pos'] ?? ((int) City::where('country_id', $countryId)->max('pos') + 1);
+
         City::create($validated);
 
-        return redirect()->route('admin.cities.index', ['country_id' => $validated['country_id']])
-            ->with('success', 'City added successfully!');
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'Kuwait area added successfully! (تمت إضافة المنطقة بنجاح)');
     }
 
-    public function edit(int $id)
-    {
-        $city = City::with('neighborhoods')->findOrFail($id);
-        $countries = Country::orderBy('pos')->get();
-        return view('admin.cities.edit', compact('city', 'countries'));
-    }
-
+    /**
+     * Update an existing Kuwait location
+     */
     public function update(Request $request, int $id)
     {
         $city = City::findOrFail($id);
         $validated = $request->validate([
-            'country_id' => 'required|exists:countries,id',
             'name' => 'required|string|max:100',
             'name_ar' => 'required|string|max:100',
             'pos' => 'nullable|integer',
@@ -69,17 +68,19 @@ class CityAdminController extends Controller
         $validated['is_active'] = $request->boolean('is_active', true);
         $city->update($validated);
 
-        return redirect()->route('admin.cities.index', ['country_id' => $validated['country_id']])
-            ->with('success', 'City updated successfully!');
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'Kuwait area updated successfully! (تم تحديث المنطقة بنجاح)');
     }
 
+    /**
+     * Delete an area
+     */
     public function destroy(int $id)
     {
         $city = City::findOrFail($id);
-        $countryId = $city->country_id;
         $city->delete();
 
-        return redirect()->route('admin.cities.index', ['country_id' => $countryId])
-            ->with('success', 'City deleted.');
+        return redirect()->route('admin.cities.index')
+            ->with('success', 'Location deleted successfully.');
     }
 }

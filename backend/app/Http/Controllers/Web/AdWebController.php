@@ -188,11 +188,12 @@ class AdWebController extends Controller
             return redirect()->route('login')->with('info', 'Please login to post a listing.');
         }
 
-        $countries = Country::where('is_active', true)->orderBy('pos')->get();
+        $kuwait = Country::where('code', 'KW')->first() ?? Country::first();
+        $cities = City::where('country_id', $kuwait->id ?? 1)->where('is_active', true)->orderBy('pos')->get();
         $categories = Category::whereNull('parent_id')->where('is_active', true)->with('subcategories')->get();
         $user = Auth::user();
 
-        return view('web.ads.create', compact('countries', 'categories', 'user'));
+        return view('web.ads.create', compact('kuwait', 'cities', 'categories', 'user'));
     }
 
     /**
@@ -204,13 +205,15 @@ class AdWebController extends Controller
             return redirect()->route('login');
         }
 
+        $kuwait = Country::where('code', 'KW')->first() ?? Country::first();
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'title_ar' => 'nullable|string|max:255',
             'description' => 'required|string',
             'description_ar' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'country_id' => 'required|exists:countries,id',
+            'country_id' => 'nullable|exists:countries,id',
             'city_id' => 'required|exists:cities,id',
             'neighborhood_name' => 'nullable|string|max:100',
             'category_id' => 'required|exists:categories,id',
@@ -223,7 +226,7 @@ class AdWebController extends Controller
             'photos.*' => 'string', // URL or uploaded image path
         ]);
 
-        $country = Country::findOrFail($validated['country_id']);
+        $countryId = $validated['country_id'] ?? ($kuwait->id ?? 1);
 
         $attributes = [];
         if ($request->has('attributes') && is_array($request->attributes)) {
@@ -234,7 +237,7 @@ class AdWebController extends Controller
             'user_id' => Auth::id(),
             'category_id' => $validated['category_id'],
             'sub_category_id' => $validated['sub_category_id'] ?? null,
-            'country_id' => $validated['country_id'],
+            'country_id' => $countryId,
             'city_id' => $validated['city_id'],
             'neighborhood_name' => $validated['neighborhood_name'] ?? null,
             'title' => $validated['title'],

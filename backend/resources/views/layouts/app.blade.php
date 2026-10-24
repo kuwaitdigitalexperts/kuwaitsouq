@@ -66,12 +66,12 @@
     <!-- Top Universal Bar: Country, Language & Demo Role Switcher -->
     <header class="bg-slate-900 text-white text-xs py-1.5 px-4 sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-            <!-- Active Country & Language -->
+            <!-- Active Country & Area (Strictly Kuwait) -->
             <div class="flex items-center gap-3">
-                <button type="button" onclick="openCountryModal()" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md transition font-medium text-amber-400">
-                    <span>{{ $currentCountry->flag ?? '🇰🇼' }}</span>
-                    <span>{{ $currentCountry->display_name ?? 'Kuwait' }} ({{ $currentCountry->display_currency ?? 'KWD' }})</span>
-                    <i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                <button type="button" onclick="openAreaModal()" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md transition font-medium text-amber-400">
+                    <span>🇰🇼</span>
+                    <span>{{ ($isRtl ?? true) ? 'الكويت' : 'Kuwait' }} (KWD)</span>
+                    <i class="fa-solid fa-location-dot text-[10px] text-blue-400 ml-1"></i>
                 </button>
 
                 <div class="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded text-[11px]">
@@ -201,13 +201,19 @@
             </div>
 
             <div>
-                <h4 class="font-extrabold text-slate-900 text-sm mb-3">{{ ($isRtl ?? true) ? 'دول الخليج' : 'Gulf Countries' }}</h4>
-                <ul class="space-y-2">
-                    @foreach($allCountries as $c)
+                <h4 class="font-extrabold text-slate-900 text-sm mb-3">{{ ($isRtl ?? true) ? 'مناطق ومحافظات الكويت' : 'Kuwait Areas' }}</h4>
+                <ul class="space-y-1.5 text-xs text-slate-600 max-h-48 overflow-y-auto">
+                    <li>
+                        <a href="{{ route('home') }}" class="hover:text-blue-600 font-bold flex items-center gap-1.5 text-blue-600">
+                            <i class="fa-solid fa-globe text-[10px]"></i>
+                            <span>{{ ($isRtl ?? true) ? 'كل مناطق الكويت' : 'All Kuwait' }}</span>
+                        </a>
+                    </li>
+                    @foreach($allCities as $area)
                         <li>
-                            <a href="{{ route('country.switch', $c->id) }}" class="hover:text-blue-600 flex items-center gap-2">
-                                <span>{{ $c->flag }}</span>
-                                <span>{{ $c->display_name }}</span>
+                            <a href="{{ route('home', ['city_id' => $area->id]) }}" class="hover:text-blue-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-location-dot text-[10px] text-slate-400"></i>
+                                <span>{{ $area->display_name }}</span>
                             </a>
                         </li>
                     @endforeach
@@ -277,32 +283,36 @@
         </div>
     </nav>
 
-    <!-- Country Selector Modal -->
-    <div id="countryModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <!-- Kuwait Area Selector Modal -->
+    <div id="areaModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl animate-scale-up">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
                 <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-globe text-blue-600"></i>
-                    <span>{{ ($isRtl ?? true) ? 'اختر الدولة (دول الخليج)' : 'Select Country (Gulf)' }}</span>
+                    <i class="fa-solid fa-location-dot text-blue-600"></i>
+                    <span>{{ ($isRtl ?? true) ? 'اختر المنطقة في الكويت' : 'Select Kuwait Area' }}</span>
                 </h3>
-                <button type="button" onclick="closeCountryModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                <button type="button" onclick="closeAreaModal()" class="text-slate-400 hover:text-slate-600 text-lg">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="space-y-2">
-                @foreach($allCountries as $country)
-                    <a href="{{ route('country.switch', $country->id) }}" class="flex items-center justify-between p-3 rounded-xl border {{ ($currentCountry->id ?? null) === $country->id ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold' : 'border-slate-100 hover:bg-slate-50 text-slate-800' }} transition">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">{{ $country->flag }}</span>
-                            <div class="text-start">
-                                <div class="text-sm font-semibold">{{ $country->display_name }}</div>
-                                <div class="text-[11px] text-slate-400">{{ $country->code }} • {{ $country->phone_code }}</div>
-                            </div>
+            <div class="space-y-2 max-h-80 overflow-y-auto">
+                <a href="{{ route('home') }}" class="flex items-center justify-between p-3 rounded-xl border border-blue-600 bg-blue-50 text-blue-900 font-bold transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🇰🇼</span>
+                        <div>
+                            <div class="text-sm font-semibold">{{ ($isRtl ?? true) ? 'كل مناطق الكويت (جميع الإعلانات)' : 'All Kuwait (All Listings)' }}</div>
                         </div>
-                        <div class="text-xs px-2 py-1 bg-white rounded-lg border border-slate-200 font-medium">
-                            {{ $country->display_currency }}
+                    </div>
+                </a>
+
+                @foreach($allCities as $area)
+                    <a href="{{ route('home', ['city_id' => $area->id]) }}" class="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50 text-slate-800 transition">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-location-dot text-blue-500 text-xs"></i>
+                            <span class="text-xs font-semibold">{{ $area->display_name }}</span>
                         </div>
+                        <span class="text-[10px] text-slate-400 font-medium">الكويت</span>
                     </a>
                 @endforeach
             </div>
@@ -310,14 +320,14 @@
     </div>
 
     <script>
-        function openCountryModal() {
-            document.getElementById('countryModal').classList.remove('hidden');
+        function openAreaModal() {
+            document.getElementById('areaModal').classList.remove('hidden');
         }
-        function closeCountryModal() {
-            document.getElementById('countryModal').classList.add('hidden');
+        function closeAreaModal() {
+            document.getElementById('areaModal').classList.add('hidden');
         }
-        document.getElementById('countryModal').addEventListener('click', function(e) {
-            if (e.target === this) closeCountryModal();
+        document.getElementById('areaModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeAreaModal();
         });
     </script>
     @stack('scripts')

@@ -60,6 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final isAr = context.isArabic;
     return Scaffold(
       backgroundColor: AppTheme.surfaceWhite,
       appBar: AppBar(
@@ -104,13 +105,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 28),
 
               // Full Name
-              const Text('Full Name', style: TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(isAr ? 'الاسم الكامل' : 'Full Name', style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _name,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'e.g. Ratan Debbarma',
+                  hintText: isAr ? 'مثال: محمد الأحمد' : 'e.g. Mohammed Al-Ahmad',
                   hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                   prefixIcon: const Icon(Icons.person_outline, color: AppTheme.textMuted, size: 20),
                   filled: true,
@@ -120,12 +121,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.borderLight, width: 1)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5)),
                 ),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Name is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty ? (isAr ? 'يرجى إدخال الاسم' : 'Name is required') : null,
               ),
               const SizedBox(height: 18),
 
               // Email Address
-              const Text('Email Address', style: TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(isAr ? 'البريد الإلكتروني' : 'Email Address', style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _email,
@@ -142,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.borderLight, width: 1)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5)),
                 ),
-                validator: (v) => v == null || !v.contains('@') ? 'Enter a valid email' : null,
+                validator: (v) => v == null || !v.contains('@') ? (isAr ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Enter a valid email') : null,
               ),
               const SizedBox(height: 18),
 
@@ -154,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: _obscure,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'At least 8 characters',
+                  hintText: isAr ? 'على الأقل 8 أحرف' : 'At least 8 characters',
                   hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                   prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.textMuted, size: 20),
                   suffixIcon: IconButton(
@@ -168,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.borderLight, width: 1)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5)),
                 ),
-                validator: (v) => v == null || v.length < 8 ? 'Minimum 8 characters' : null,
+                validator: (v) => v == null || v.length < 8 ? (isAr ? 'الحد الأدنى 8 أحرف' : 'Minimum 8 characters') : null,
               ),
               const SizedBox(height: 28),
 

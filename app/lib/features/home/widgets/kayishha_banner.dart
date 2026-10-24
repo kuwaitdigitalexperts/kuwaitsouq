@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/providers/country_provider.dart';
-import '../../../../shared/theme/app_theme.dart';
 
 class KayishhaBanner extends StatelessWidget {
   const KayishhaBanner({super.key});
@@ -14,14 +14,16 @@ class KayishhaBanner extends StatelessWidget {
     final phoneCtrl = TextEditingController();
     final priceCtrl = TextEditingController();
     final countryProv = context.read<CountryProvider>();
+    final isAr = context.isArabic;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) {
-          bool isSubmitting = false;
+      builder: (ctx) {
+        bool isSubmitting = false;
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
 
           return Container(
             decoration: const BoxDecoration(
@@ -64,22 +66,22 @@ class KayishhaBanner extends StatelessWidget {
                         child: const Icon(Icons.car_rental, color: Color(0xFFD97706), size: 28),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'كيّشها كاش مع كويت سوق 🚗',
-                              style: TextStyle(
+                              context.tr('kayishha_modal_title'),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF0F172A),
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'بيع سيارتك فوراً واستلم كاش خلال 24 ساعة بأعلى تقييم سوقي',
-                              style: TextStyle(
+                              context.tr('kayishha_modal_sub'),
+                              style: const TextStyle(
                                 fontSize: 11,
                                 color: Color(0xFF64748B),
                                 height: 1.3,
@@ -97,7 +99,7 @@ class KayishhaBanner extends StatelessWidget {
                   TextField(
                     controller: makeCtrl,
                     decoration: InputDecoration(
-                      labelText: 'الشركة المصنعة (مثال: تويوتا، لاند كروزر)',
+                      labelText: context.tr('car_make'),
                       prefixIcon: const Icon(Icons.directions_car, size: 20),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -111,7 +113,7 @@ class KayishhaBanner extends StatelessWidget {
                         child: TextField(
                           controller: modelCtrl,
                           decoration: InputDecoration(
-                            labelText: 'الموديل (الفئة)',
+                            labelText: context.tr('car_model'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           ),
@@ -123,7 +125,7 @@ class KayishhaBanner extends StatelessWidget {
                           controller: yearCtrl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            labelText: 'سنة الصنع (مثال: 2022)',
+                            labelText: context.tr('manufacture_year'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           ),
@@ -137,7 +139,7 @@ class KayishhaBanner extends StatelessWidget {
                     controller: priceCtrl,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'السعر المطلوب تقريبياً (${countryProv.currencySymbol})',
+                      labelText: '${context.tr('approx_price')} (${countryProv.currency(isAr)})',
                       prefixIcon: const Icon(Icons.monetization_on_outlined, size: 20),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -149,7 +151,7 @@ class KayishhaBanner extends StatelessWidget {
                     controller: phoneCtrl,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      labelText: 'رقم الهاتف للتواصل واستلام العرض',
+                      labelText: context.tr('contact_phone'),
                       prefixIcon: const Icon(Icons.phone_outlined, size: 20),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -173,13 +175,13 @@ class KayishhaBanner extends StatelessWidget {
                             final phone = phoneCtrl.text.trim();
                             if (make.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('يرجى تحديد نوع وموديل السيارة')),
+                                SnackBar(content: Text(isAr ? 'يرجى تحديد نوع وموديل السيارة' : 'Please specify car make and model')),
                               );
                               return;
                             }
                             if (phone.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('يرجى إدخال رقم هاتفك للتواصل')),
+                                SnackBar(content: Text(isAr ? 'يرجى إدخال رقم هاتفك للتواصل' : 'Please enter your phone number')),
                               );
                               return;
                             }
@@ -191,7 +193,7 @@ class KayishhaBanner extends StatelessWidget {
                               'year': yearCtrl.text.trim(),
                               'price': priceCtrl.text.trim(),
                               'phone': phone,
-                              'country': countryProv.countryNameAr,
+                              'country': countryProv.countryName(isAr),
                             });
 
                             if (!ctx.mounted) return;
@@ -201,14 +203,14 @@ class KayishhaBanner extends StatelessWidget {
                                 backgroundColor: const Color(0xFF0F172A),
                                 behavior: SnackBarBehavior.floating,
                                 content: Text(
-                                  res['message'] ?? 'تم إرسال طلب التقييم بنجاح! سيتواصل معك ممثل كويت سوق فوراً.',
+                                  res['message'] ?? (isAr ? 'تم إرسال طلب التقييم بنجاح! سيتواصل معك ممثل كويت سوق فوراً.' : 'Evaluation request submitted successfully! A representative will contact you shortly.'),
                                 ),
                               ),
                             );
                           },
-                    child: const Text(
-                      'إرسال طلب كيشها واستلام كاش فوري 💵',
-                      style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold),
+                    child: Text(
+                      context.tr('send_kayishha'),
+                      style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -216,8 +218,9 @@ class KayishhaBanner extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
+      );
+    },
+  );
   }
 
   @override
@@ -255,23 +258,23 @@ class KayishhaBanner extends StatelessWidget {
               child: const Icon(Icons.car_crash_outlined, color: Color(0xFFB45309), size: 26),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'كيشها كاش مع كويت سوق 🚗',
-                    style: TextStyle(
+                    context.tr('kayishha_title'),
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
                       color: Color(0xFF78350F),
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    'احصل على أفضل سعر فوري لسيارتك الآن وبعها بدقائق',
-                    style: TextStyle(
+                    context.tr('kayishha_sub'),
+                    style: const TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF92400E),

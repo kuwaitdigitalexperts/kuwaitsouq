@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/localization/app_localizations.dart';
 import 'kuwaitsouq_logo.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -56,11 +57,11 @@ class _MainScaffoldState extends State<MainScaffold> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(0, Icons.home_outlined, Icons.home, 'الرئيسية'),
-                _buildNavItem(1, Icons.grid_view_outlined, Icons.grid_view, 'الأقسام'),
-                _buildPostAdNavItem(),
-                _buildNavItem(3, Icons.article_outlined, Icons.article, 'إعلاناتي'),
-                _buildNavItem(4, Icons.person_outline, Icons.person, 'حسابي'),
+                _buildNavItem(0, Icons.home_outlined, Icons.home, context.tr('nav_home')),
+                _buildNavItem(1, Icons.grid_view_outlined, Icons.grid_view, context.tr('nav_categories')),
+                _buildPostAdNavItem(context),
+                _buildNavItem(3, Icons.article_outlined, Icons.article, context.tr('nav_my_ads')),
+                _buildNavItem(4, Icons.person_outline, Icons.person, context.tr('nav_account')),
               ],
             ),
           ),
@@ -103,7 +104,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   }
 
   // Prominent Center "Post Ad" Button (+)
-  Widget _buildPostAdNavItem() {
+  Widget _buildPostAdNavItem(BuildContext context) {
     return InkWell(
       onTap: () => _onTabTapped(2),
       borderRadius: BorderRadius.circular(20),
@@ -131,9 +132,9 @@ class _MainScaffoldState extends State<MainScaffold> {
             child: const Icon(Icons.add, color: Colors.white, size: 26),
           ),
           const SizedBox(height: 2),
-          const Text(
-            'أضف إعلان',
-            style: TextStyle(
+          Text(
+            context.tr('nav_post'),
+            style: const TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2563EB),
@@ -149,14 +150,14 @@ class _MainScaffoldState extends State<MainScaffold> {
       child: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
+            const Padding(
+              padding: EdgeInsets.all(20),
               child: KuwaitSouqLogo(fontSize: 22.0, showTagline: true),
             ),
             const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.home, color: Color(0xFF2563EB)),
-              title: const Text('الرئيسية'),
+              title: Text(context.tr('nav_home')),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/');
@@ -164,7 +165,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.grid_view, color: Color(0xFF0D9488)),
-              title: const Text('الأقسام والتصنيفات'),
+              title: Text(context.tr('categories_title')),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/categories');
@@ -172,7 +173,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.favorite_outline, color: Color(0xFFE11D48)),
-              title: const Text('المفضلة والإعلانات المحفوظة'),
+              title: Text(context.tr('favorite_ads')),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/saved');
@@ -180,7 +181,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline, color: Color(0xFF2563EB)),
-              title: const Text('الرسائل والمحادثات'),
+              title: Text(context.tr('nav_chat')),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/messages');
@@ -188,7 +189,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.article, color: Color(0xFFF59E0B)),
-              title: const Text('إعلاناتي'),
+              title: Text(context.tr('nav_my_ads')),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/listings');
@@ -196,7 +197,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF8B5CF6)),
-              title: const Text('حسابي'),
+              title: Text(context.tr('nav_account')),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/account');

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/chat_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -52,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.isArabic;
     final auth = context.watch<AuthProvider>();
     final chat = context.watch<ChatProvider>();
     final me = int.tryParse(auth.user?['id']?.toString() ?? '');
@@ -90,16 +92,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.userName ?? 'Seller / Buyer',
+                    widget.userName ?? (isArabic ? 'المعلن / المشتري' : 'Seller / Buyer'),
                     style: const TextStyle(color: AppTheme.textDark, fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  const Row(
+                  Row(
                     children: [
-                      CircleAvatar(radius: 3.5, backgroundColor: AppTheme.primaryGreen),
-                      SizedBox(width: 4),
+                      const CircleAvatar(radius: 3.5, backgroundColor: AppTheme.primaryGreen),
+                      const SizedBox(width: 4),
                       Text(
-                        'متصل الآن · الكويت (Online · Kuwait)',
-                        style: TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.w500),
+                        isArabic ? 'متصل الآن · الكويت' : 'Online · Kuwait',
+                        style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -114,20 +116,20 @@ class _ChatScreenState extends State<ChatScreen> {
           // Message Bubbles List
           Expanded(
             child: msgs.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline, size: 54, color: AppTheme.textMuted),
-                        SizedBox(height: 12),
+                        const Icon(Icons.chat_bubble_outline, size: 54, color: AppTheme.textMuted),
+                        const SizedBox(height: 12),
                         Text(
-                          'No messages yet',
-                          style: TextStyle(color: AppTheme.textDark, fontSize: 15, fontWeight: FontWeight.bold),
+                          isArabic ? 'لا توجد رسائل بعد' : 'No messages yet',
+                          style: const TextStyle(color: AppTheme.textDark, fontSize: 15, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'Send a message to inquire about the item',
-                          style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                          isArabic ? 'أرسل رسالة للاستفسار عن السلعة والاتفاق مع البائع' : 'Send a message to inquire about the item',
+                          style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
                         ),
                       ],
                     ),
@@ -197,12 +199,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: TextField(
                         controller: _ctrl,
                         style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
-                        decoration: const InputDecoration(
-                          hintText: 'Type a message...',
-                          hintStyle: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: isArabic ? 'اكتب رسالتك هنا...' : 'Type a message...',
+                          hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                         textInputAction: TextInputAction.send,
                         onSubmitted: (_) => _send(),
@@ -214,7 +216,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     radius: 20,
                     backgroundColor: AppTheme.primaryGreen,
                     child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white, size: 18),
+                      icon: Transform.rotate(
+                        angle: isArabic ? 3.14159 : 0,
+                        child: const Icon(Icons.send, color: Colors.white, size: 18),
+                      ),
                       onPressed: _send,
                     ),
                   ),

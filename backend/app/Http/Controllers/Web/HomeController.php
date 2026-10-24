@@ -14,11 +14,8 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $countryId = session('country_id');
-        $currentCountry = $countryId ? Country::find($countryId) : Country::where('is_default', true)->first();
-        if (!$currentCountry) {
-            $currentCountry = Country::first();
-        }
+        $kuwait = Country::where('code', 'KW')->first() ?? Country::where('is_active', true)->first();
+        $currentCountry = $kuwait;
 
         // Parent Categories
         $categories = Category::whereNull('parent_id')
@@ -37,8 +34,8 @@ class HomeController extends Controller
             ->take(15)
             ->get();
 
-        // Cities in current country
-        $cities = $currentCountry ? $currentCountry->cities()->where('is_active', true)->get() : collect();
+        // Cities in Kuwait
+        $cities = City::where('country_id', $kuwait->id ?? 1)->where('is_active', true)->orderBy('pos')->get();
 
         // Ads Query
         $adsQuery = Ad::where('status', 'active')

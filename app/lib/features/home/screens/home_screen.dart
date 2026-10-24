@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/providers/country_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       search: _searchQuery.isNotEmpty ? _searchQuery : null,
       countryId: country['id'] as int?,
       countryCode: country['code'] as String?,
+      locationId: countryProv.selectedCityId,
     );
   }
 
@@ -120,16 +122,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'أحدث الإعلانات المميزة (${ads.length})',
+                      '${context.tr('featured_ads_title')} (${ads.length})',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: AppTheme.textDark,
                       ),
                     ),
-                    const Text(
-                      'الكويت والخليج',
-                      style: TextStyle(
+                    Text(
+                      context.tr('kuwait_and_gcc'),
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2563EB),
@@ -160,22 +162,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(Icons.inventory_2_outlined, size: 48, color: Color(0xFF94A3B8)),
-                      SizedBox(height: 12),
+                      const Icon(Icons.inventory_2_outlined, size: 48, color: Color(0xFF94A3B8)),
+                      const SizedBox(height: 12),
                       Text(
-                        'لا توجد إعلانات مطابقة حالياً',
-                        style: TextStyle(
+                        context.tr('no_ads_category_msg'),
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textDark,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'كن أول من يضيف إعلاناً في هذا القسم أو الدولة',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        context.tr('first_to_post_msg'),
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                       ),
                     ],
                   ),

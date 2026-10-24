@@ -19,8 +19,8 @@
         <div class="bg-slate-950 rounded-2xl border border-slate-800 p-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg border border-blue-800/50">
-                        <i class="fa-solid fa-shapes"></i>
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center p-1 overflow-hidden">
+                        <img src="{{ $cat->icon_url }}" alt="{{ $cat->name }}" class="w-8 h-8 object-contain" onerror="this.onerror=null;this.src='{{ asset('images/categories/all_categories.png') }}';">
                     </div>
                     <div>
                         <div class="text-sm font-extrabold text-white flex items-center gap-2">

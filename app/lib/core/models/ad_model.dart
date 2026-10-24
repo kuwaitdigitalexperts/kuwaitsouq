@@ -3,7 +3,9 @@ import '../api/api_client.dart';
 class AdModel {
   final int id;
   final String title;
+  final String? titleAr;
   final String description;
+  final String? descriptionAr;
   final double price;
   final String currency;
   final String condition;
@@ -24,7 +26,9 @@ class AdModel {
   const AdModel({
     required this.id,
     required this.title,
+    this.titleAr,
     required this.description,
+    this.descriptionAr,
     required this.price,
     required this.currency,
     required this.condition,
@@ -46,8 +50,10 @@ class AdModel {
   factory AdModel.fromJson(Map<String, dynamic> json) {
     return AdModel(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
+      title: json['title'] as String? ?? json['title_ar'] as String? ?? '',
+      titleAr: json['title_ar'] as String?,
+      description: json['description'] as String? ?? json['description_ar'] as String? ?? '',
+      descriptionAr: json['description_ar'] as String?,
       price: double.tryParse(json['price']?.toString() ?? '') ?? 0.0,
       currency: json['currency'] as String? ?? 'KD',
       condition: json['condition'] as String? ?? 'used',
@@ -85,7 +91,9 @@ class AdModel {
   AdModel copyWith({
     int? id,
     String? title,
+    String? titleAr,
     String? description,
+    String? descriptionAr,
     double? price,
     String? currency,
     String? condition,
@@ -106,7 +114,9 @@ class AdModel {
     return AdModel(
       id: id ?? this.id,
       title: title ?? this.title,
+      titleAr: titleAr ?? this.titleAr,
       description: description ?? this.description,
+      descriptionAr: descriptionAr ?? this.descriptionAr,
       price: price ?? this.price,
       currency: currency ?? this.currency,
       condition: condition ?? this.condition,
@@ -124,6 +134,61 @@ class AdModel {
       media: media ?? this.media,
       createdAt: createdAt ?? this.createdAt,
     );
+  }
+
+  String localizedTitle(bool isArabic) {
+    if (isArabic) {
+      if (titleAr != null && titleAr!.trim().isNotEmpty) return titleAr!;
+      return title;
+    } else {
+      if (title.trim().isNotEmpty) return title;
+      return titleAr ?? '';
+    }
+  }
+
+  String localizedDescription(bool isArabic) {
+    if (isArabic) {
+      if (descriptionAr != null && descriptionAr!.trim().isNotEmpty) return descriptionAr!;
+      return description;
+    } else {
+      if (description.trim().isNotEmpty) return description;
+      return descriptionAr ?? '';
+    }
+  }
+
+  String localizedLocation(bool isArabic) {
+    if (location != null) {
+      final name = isArabic
+          ? (location!['name_ar'] ?? location!['name'] ?? location!['city'])
+          : (location!['name'] ?? location!['name_en'] ?? location!['name_ar'] ?? location!['city']);
+      final country = isArabic
+          ? (location!['country']?['name_ar'] ?? location!['country']?['name'])
+          : (location!['country']?['name'] ?? location!['country']?['name_ar']);
+      if (name != null && country != null) {
+        return '$name, $country';
+      }
+      return name?.toString() ?? (isArabic ? 'الكويت' : 'Kuwait');
+    }
+    return isArabic ? 'الكويت' : 'Kuwait';
+  }
+
+  String localizedCategory(bool isArabic) {
+    if (category != null) {
+      if (isArabic) {
+        return category!['name_ar'] as String? ?? category!['name'] as String? ?? '';
+      } else {
+        return category!['name'] as String? ?? category!['name_ar'] as String? ?? '';
+      }
+    }
+    return '';
+  }
+
+  String localizedCurrency(bool isArabic) {
+    if (isArabic) {
+      return (currency == 'KD' || currency == 'KWD') ? 'د.ك' : currency;
+    } else {
+      return (currency == 'د.ك' || currency == 'KWD') ? 'KD' : currency;
+    }
   }
 
   String get locationName {

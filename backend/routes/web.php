@@ -112,3 +112,17 @@ Route::get('/storage/{path}', function (string $path) {
     return response()->file($fullPath);
 })->where('path', '.*');
 
+// Seed 12 Live Kuwait Products
+Route::get('/seed-12-products', function () {
+    $sqlPath = database_path('12_live_products.sql');
+    if (file_exists($sqlPath)) {
+        \Illuminate\Support\Facades\DB::unprepared(file_get_contents($sqlPath));
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully added/updated 12 authentic Kuwait products in floopkok_kuwaitsouq database!',
+            'total_active_ads' => \App\Models\Ad::where('status', 'active')->count(),
+        ]);
+    }
+    return response()->json(['error' => 'SQL file not found'], 404);
+});
+

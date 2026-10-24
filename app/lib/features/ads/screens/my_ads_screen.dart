@@ -99,7 +99,16 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final ad = myAds[index];
-                    final fmt = NumberFormat.currency(locale: 'ar_KW', symbol: '${ad.currency} ', decimalDigits: 0);
+                    final isArabic = context.isArabic;
+                    final currency = ad.localizedCurrency(isArabic);
+                    final fmt = NumberFormat.currency(
+                      locale: isArabic ? 'ar_KW' : 'en_KW',
+                      symbol: '$currency ',
+                      decimalDigits: 0,
+                    );
+                    final title = ad.localizedTitle(isArabic);
+                    final location = ad.localizedLocation(isArabic);
+                    final locationText = location.isNotEmpty ? location : (isArabic ? 'مدينة الكويت' : 'Kuwait City');
 
                     return Container(
                       decoration: BoxDecoration(
@@ -147,7 +156,7 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  ad.title,
+                                  title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -158,7 +167,7 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  ad.locationName.isNotEmpty ? ad.locationName : 'مدينة الكويت (Kuwait City)',
+                                  locationText,
                                   style: const TextStyle(color: AppTheme.textMuted, fontSize: 11),
                                 ),
                               ],
@@ -171,19 +180,27 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
                                 context: context,
                                 builder: (ctx) => AlertDialog(
                                   backgroundColor: AppTheme.surfaceWhite,
-                                  title: Text(context.tr('delete'), style: const TextStyle(color: AppTheme.textDark)),
+                                  title: Text(
+                                    isArabic ? 'حذف الإعلان' : 'Delete Listing',
+                                    style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold),
+                                  ),
                                   content: Text(
-                                    context.tr('delete'),
-                                    style: const TextStyle(color: AppTheme.textMuted),
+                                    isArabic
+                                        ? 'هل أنت متأكد من رغبتك في حذف هذا الإعلان نهائياً؟ لا يمكن التراجع عن هذا الإجراء.'
+                                        : 'Are you sure you want to permanently delete this listing? This action cannot be undone.',
+                                    style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, false),
-                                      child: Text(context.tr('cancel')),
+                                      child: Text(isArabic ? 'إلغاء' : 'Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, true),
-                                      child: Text(context.tr('delete'), style: const TextStyle(color: Colors.redAccent)),
+                                      child: Text(
+                                        isArabic ? 'حذف' : 'Delete',
+                                        style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ],
                                 ),

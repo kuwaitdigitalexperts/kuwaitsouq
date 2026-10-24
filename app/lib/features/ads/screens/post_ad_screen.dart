@@ -46,10 +46,11 @@ class _PostAdScreenState extends State<PostAdScreen> {
   }
 
   Future<void> _pickImages() async {
+    final isArabic = context.isArabic;
     final remainingSlots = 4 - _images.length;
     if (remainingSlots <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximum 4 photos allowed.')),
+        SnackBar(content: Text(isArabic ? 'الحد الأقصى 4 صور فقط.' : 'Maximum 4 photos allowed.')),
       );
       return;
     }
@@ -68,8 +69,11 @@ class _PostAdScreenState extends State<PostAdScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined, color: AppTheme.primaryBlue),
-                title: const Text('Choose Photos from Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: Text('Select up to $remainingSlots photos'),
+                title: Text(
+                  isArabic ? 'اختيار صور من المعرض' : 'Choose Photos from Gallery',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(isArabic ? 'اختر حتى $remainingSlots صور' : 'Select up to $remainingSlots photos'),
                 onTap: () async {
                   Navigator.pop(ctx);
                   try {
@@ -88,7 +92,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined, color: AppTheme.primaryGreen),
-                title: const Text('Take a Photo with Camera', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text(
+                  isArabic ? 'التقاط صورة بالكاميرا' : 'Take a Photo with Camera',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
                   try {
@@ -113,6 +120,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
   }
 
   Future<void> _pickVideo() async {
+    final isArabic = context.isArabic;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surfaceWhite,
@@ -127,8 +135,11 @@ class _PostAdScreenState extends State<PostAdScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.video_library_outlined, color: AppTheme.accentOrange),
-                title: const Text('Choose Video from Gallery', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('Max 1 video, up to 50MB'),
+                title: Text(
+                  isArabic ? 'اختيار فيديو من المعرض' : 'Choose Video from Gallery',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(isArabic ? 'فيديو واحد كحد أقصى، حتى 50 ميجابايت' : 'Max 1 video, up to 50MB'),
                 onTap: () async {
                   Navigator.pop(ctx);
                   try {
@@ -142,9 +153,13 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       if (sizeBytes > 52428800) {
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               backgroundColor: Colors.redAccent,
-                              content: Text('Video file exceeds 50MB. Please choose a smaller clip.'),
+                              content: Text(
+                                isArabic
+                                    ? 'حجم ملف الفيديو يتجاوز 50 ميجابايت. الرجاء اختيار مقطع أصغر.'
+                                    : 'Video file exceeds 50MB. Please choose a smaller clip.',
+                              ),
                             ),
                           );
                         }
@@ -159,7 +174,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.videocam_outlined, color: AppTheme.primaryBlue),
-                title: const Text('Record a Video with Camera', style: TextStyle(fontWeight: FontWeight.w600)),
+                title: Text(
+                  isArabic ? 'تسجيل فيديو بالكاميرا' : 'Record a Video with Camera',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
                   try {
@@ -173,9 +191,11 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       if (sizeBytes > 52428800) {
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               backgroundColor: Colors.redAccent,
-                              content: Text('Video file exceeds 50MB.'),
+                              content: Text(
+                                isArabic ? 'حجم ملف الفيديو يتجاوز 50 ميجابايت.' : 'Video file exceeds 50MB.',
+                              ),
                             ),
                           );
                         }
@@ -196,6 +216,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
   }
 
   Future<void> _submit() async {
+    final isArabic = context.isArabic;
     final auth = context.read<AuthProvider>();
     if (!auth.isAuthenticated) {
       final ok = await AuthBottomSheet.show(context);
@@ -207,14 +228,14 @@ class _PostAdScreenState extends State<PostAdScreen> {
     final targetCatId = _subCategoryId ?? _parentCategoryId;
     if (targetCatId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
+        SnackBar(content: Text(isArabic ? 'الرجاء اختيار القسم' : 'Please select a category')),
       );
       return;
     }
 
     if (_locationId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select your location')),
+        SnackBar(content: Text(isArabic ? 'الرجاء اختيار موقع الإعلان' : 'Please select your location')),
       );
       return;
     }
@@ -241,9 +262,9 @@ class _PostAdScreenState extends State<PostAdScreen> {
     if (!mounted) return;
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: AppTheme.primaryGreen,
-          content: Text('Ad posted successfully!'),
+          content: Text(isArabic ? 'تم نشر الإعلان بنجاح!' : 'Ad posted successfully!'),
         ),
       );
       context.go('/');
@@ -251,7 +272,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text(context.read<AdsProvider>().error ?? 'Failed to post ad'),
+          content: Text(context.read<AdsProvider>().error ?? (isArabic ? 'فشل نشر الإعلان' : 'Failed to post ad')),
         ),
       );
     }
@@ -259,6 +280,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.isArabic;
     final cats = context.watch<CategoriesProvider>();
     final ads = context.watch<AdsProvider>();
     final subcategories = _parentCategoryId != null
@@ -275,7 +297,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          context.tr('post_ad_title'),
+          isArabic ? 'أضف إعلانك' : context.tr('post_ad_title'),
           style: const TextStyle(color: AppTheme.textDark, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -291,17 +313,17 @@ class _PostAdScreenState extends State<PostAdScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${context.tr('add_photos')} (${_images.length}/4)',
+                    '${isArabic ? "إضافة الصور" : context.tr('add_photos')} (${_images.length}/4)',
                     style: const TextStyle(color: AppTheme.textDark, fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   if (_images.length < 4)
                     InkWell(
                       onTap: _pickImages,
                       child: Row(
-                        children: const [
-                          Icon(Icons.add_photo_alternate, size: 16, color: AppTheme.primaryBlue),
-                          SizedBox(width: 4),
-                          Text('Add Photo', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 13, fontWeight: FontWeight.w600)),
+                        children: [
+                          const Icon(Icons.add_photo_alternate, size: 16, color: AppTheme.primaryBlue),
+                          const SizedBox(width: 4),
+                          Text(isArabic ? 'إضافة صورة' : 'Add Photo', style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 13, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
@@ -359,10 +381,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
                                     color: Colors.black.withOpacity(0.65),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: const Text(
-                                    'Main',
+                                  child: Text(
+                                    isArabic ? 'الرئيسية' : 'Main',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -384,10 +406,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.add_a_photo_outlined, color: AppTheme.primaryBlue, size: 24),
-                              SizedBox(height: 6),
-                              Text('Add Photo', style: TextStyle(color: AppTheme.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+                            children: [
+                              const Icon(Icons.add_a_photo_outlined, color: AppTheme.primaryBlue, size: 24),
+                              const SizedBox(height: 6),
+                              Text(isArabic ? 'إضافة صورة' : 'Add Photo', style: const TextStyle(color: AppTheme.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
                             ],
                           ),
                         ),
@@ -401,12 +423,14 @@ class _PostAdScreenState extends State<PostAdScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Product Video',
-                    style: TextStyle(color: AppTheme.textDark, fontSize: 14, fontWeight: FontWeight.bold),
+                  Text(
+                    isArabic ? 'فيديو السلعة' : 'Product Video',
+                    style: const TextStyle(color: AppTheme.textDark, fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    _video != null ? '1/1 Added' : 'Optional (max 1)',
+                    _video != null
+                        ? (isArabic ? 'تمت إضافة 1/1' : '1/1 Added')
+                        : (isArabic ? 'اختياري (فيديو واحد)' : 'Optional (max 1)'),
                     style: TextStyle(
                       color: _video != null ? AppTheme.primaryGreen : AppTheme.textMuted,
                       fontSize: 12,
@@ -441,15 +465,17 @@ class _PostAdScreenState extends State<PostAdScreen> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                'Add a Product Video',
-                                style: TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600),
+                                isArabic ? 'إضافة فيديو للمنتج' : 'Add a Product Video',
+                                style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'Showcase your item with a quick video clip (up to 50MB)',
-                                style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
+                                isArabic
+                                    ? 'اعرض سلعتك بمقطع فيديو سريع (حتى 50 ميجابايت)'
+                                    : 'Showcase your item with a quick video clip (up to 50MB)',
+                                style: const TextStyle(color: AppTheme.textMuted, fontSize: 11),
                               ),
                             ],
                           ),
@@ -491,9 +517,9 @@ class _PostAdScreenState extends State<PostAdScreen> {
                                   style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.w600),
                                 ),
                                 const SizedBox(height: 2),
-                                const Text(
-                                  'Video ready • preview below',
-                                  style: TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.w500),
+                                Text(
+                                  isArabic ? 'الفيديو جاهز • معاينة بالأسفل' : 'Video ready • preview below',
+                                  style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -501,7 +527,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                           IconButton(
                             icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 22),
                             onPressed: () => setState(() => _video = null),
-                            tooltip: 'Remove video',
+                            tooltip: isArabic ? 'حذف الفيديو' : 'Remove video',
                           ),
                         ],
                       ),
@@ -516,26 +542,47 @@ class _PostAdScreenState extends State<PostAdScreen> {
               const SizedBox(height: 22),
 
               // Title Field
-              _buildFieldLabel('${context.tr('ad_title')} *'),
+              _buildFieldLabel('${isArabic ? "عنوان الإعلان" : context.tr('ad_title')} *'),
               TextFormField(
                 controller: _titleCtrl,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
-                decoration: _buildInputDecoration(hintText: 'e.g. Brand new iPhone 14 Pro Max 128GB'),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Title is required' : null,
+                decoration: _buildInputDecoration(hintText: isArabic ? 'مثال: آيفون 14 برو ماكس 128 جيجابايت جديد' : 'e.g. Brand new iPhone 14 Pro Max 128GB'),
+                validator: (v) => v == null || v.trim().isEmpty ? (isArabic ? 'عنوان الإعلان مطلوب' : 'Title is required') : null,
               ),
               const SizedBox(height: 16),
 
               // Category Picker
-              _buildFieldLabel('${context.tr('select_category')} *'),
+              _buildFieldLabel('${isArabic ? "اختر القسم" : context.tr('select_category')} *'),
               DropdownButtonFormField<int>(
                 dropdownColor: AppTheme.surfaceWhite,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                 value: _parentCategoryId,
-                decoration: _buildInputDecoration(hintText: context.tr('select_category')),
+                decoration: _buildInputDecoration(hintText: isArabic ? 'اختر القسم' : context.tr('select_category')),
                 items: cats.topLevel.map((c) {
+                  final nameAr = c['name_ar'] as String?;
+                  final nameEn = c['name'] as String?;
+                  final catName = isArabic ? (nameAr ?? nameEn ?? '') : (nameEn ?? nameAr ?? '');
+                  final slug = (c['slug'] as String? ?? '').replaceAll('-', '_');
                   return DropdownMenuItem<int>(
                     value: c['id'] as int,
-                    child: Text(c['name'] as String, style: const TextStyle(color: AppTheme.textDark)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/images/categories/$slug.png',
+                          width: 22,
+                          height: 22,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.category_outlined,
+                            size: 18,
+                            color: AppTheme.primaryGreen,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(catName, style: const TextStyle(color: AppTheme.textDark)),
+                      ],
+                    ),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -544,52 +591,56 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     _subCategoryId = null; // reset subcategory on parent change
                   });
                 },
-                validator: (v) => v == null ? 'Please choose a category' : null,
+                validator: (v) => v == null ? (isArabic ? 'الرجاء اختيار القسم' : 'Please choose a category') : null,
               ),
               const SizedBox(height: 16),
 
               // Subcategory Picker (if available)
               if (subcategories.isNotEmpty) ...[
-                _buildFieldLabel('Subcategory *'),
+                _buildFieldLabel(isArabic ? 'القسم الفرعي *' : 'Subcategory *'),
                 DropdownButtonFormField<int>(
                   dropdownColor: AppTheme.surfaceWhite,
                   style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                   value: _subCategoryId,
-                  decoration: _buildInputDecoration(hintText: context.tr('select_category')),
+                  decoration: _buildInputDecoration(hintText: isArabic ? 'اختر القسم الفرعي' : context.tr('select_category')),
                   items: subcategories.map((c) {
+                    final nameAr = c['name_ar'] as String?;
+                    final nameEn = c['name'] as String?;
+                    final subName = isArabic ? (nameAr ?? nameEn ?? '') : (nameEn ?? nameAr ?? '');
                     return DropdownMenuItem<int>(
                       value: c['id'] as int,
-                      child: Text(c['name'] as String, style: const TextStyle(color: AppTheme.textDark)),
+                      child: Text(subName, style: const TextStyle(color: AppTheme.textDark)),
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => _subCategoryId = val),
-                  validator: (v) => v == null ? 'Please choose a subcategory' : null,
+                  validator: (v) => v == null ? (isArabic ? 'الرجاء اختيار القسم الفرعي' : 'Please choose a subcategory') : null,
                 ),
                 const SizedBox(height: 16),
               ],
 
               // Location Picker
-              _buildFieldLabel('${context.tr('ad_location')} *'),
+              _buildFieldLabel('${isArabic ? "موقع الإعلان" : context.tr('ad_location')} *'),
               DropdownButtonFormField<int>(
                 dropdownColor: AppTheme.surfaceWhite,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                 value: _locationId,
-                decoration: _buildInputDecoration(hintText: context.tr('all_districts')),
-                  items: cats.locations.map((l) {
-                    final district = (l['display_district'] ?? l['district'] ?? l['state'] ?? '').toString();
-                    final city = (l['display_name'] ?? l['name'] ?? l['city'] ?? '').toString();
-                    return DropdownMenuItem<int>(
-                      value: l['id'] as int,
-                      child: Text('$city, $district', style: const TextStyle(color: AppTheme.textDark)),
-                    );
-                  }).toList(),
+                decoration: _buildInputDecoration(hintText: isArabic ? 'اختر المنطقة' : context.tr('all_districts')),
+                items: cats.locations.map((l) {
+                  final nameAr = l['name_ar'] as String?;
+                  final nameEn = (l['display_name'] ?? l['name'] ?? '').toString();
+                  final locName = isArabic ? (nameAr ?? nameEn) : nameEn;
+                  return DropdownMenuItem<int>(
+                    value: l['id'] as int,
+                    child: Text(locName, style: const TextStyle(color: AppTheme.textDark)),
+                  );
+                }).toList(),
                 onChanged: (val) => setState(() => _locationId = val),
-                validator: (v) => v == null ? 'Please choose a location' : null,
+                validator: (v) => v == null ? (isArabic ? 'الرجاء اختيار الموقع' : 'Please choose a location') : null,
               ),
               const SizedBox(height: 16),
 
               // Price & Currency Row
-              _buildFieldLabel('${context.tr('ad_price')} *'),
+              _buildFieldLabel('${isArabic ? "السعر" : context.tr('ad_price')} *'),
               Row(
                 children: [
                   Expanded(
@@ -600,8 +651,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                       decoration: _buildInputDecoration(hintText: '0.000'),
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Enter price';
-                        if (double.tryParse(v.trim()) == null) return 'Invalid number';
+                        if (v == null || v.trim().isEmpty) return isArabic ? 'أدخل السعر' : 'Enter price';
+                        if (double.tryParse(v.trim()) == null) return isArabic ? 'رقم غير صحيح' : 'Invalid number';
                         return null;
                       },
                     ),
@@ -631,28 +682,28 @@ class _PostAdScreenState extends State<PostAdScreen> {
               const SizedBox(height: 16),
 
               // Condition
-              _buildFieldLabel('${context.tr('condition')} *'),
+              _buildFieldLabel('${isArabic ? "حالة السلعة" : context.tr('condition')} *'),
               DropdownButtonFormField<String>(
                 dropdownColor: AppTheme.surfaceWhite,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
                 value: _condition,
                 decoration: _buildInputDecoration(),
                 items: [
-                  DropdownMenuItem(value: 'used', child: Text(context.tr('condition_used'), style: const TextStyle(color: AppTheme.textDark))),
-                  DropdownMenuItem(value: 'new', child: Text(context.tr('condition_new'), style: const TextStyle(color: AppTheme.textDark))),
+                  DropdownMenuItem(value: 'used', child: Text(isArabic ? 'مستعمل' : context.tr('condition_used'), style: const TextStyle(color: AppTheme.textDark))),
+                  DropdownMenuItem(value: 'new', child: Text(isArabic ? 'جديد كلياً' : context.tr('condition_new'), style: const TextStyle(color: AppTheme.textDark))),
                 ],
                 onChanged: (v) => setState(() => _condition = v ?? 'used'),
               ),
               const SizedBox(height: 16),
 
               // Description
-              _buildFieldLabel('${context.tr('ad_description')} *'),
+              _buildFieldLabel('${isArabic ? "تفاصيل الإعلان" : context.tr('ad_description')} *'),
               TextFormField(
                 controller: _descCtrl,
                 maxLines: 4,
                 style: const TextStyle(color: AppTheme.textDark, fontSize: 14),
-                decoration: _buildInputDecoration(hintText: '...'),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Description is required' : null,
+                decoration: _buildInputDecoration(hintText: isArabic ? 'اكتب تفاصيل ومواصفات السلعة هنا...' : 'Write item details and specifications here...'),
+                validator: (v) => v == null || v.trim().isEmpty ? (isArabic ? 'الوصف مطلوب' : 'Description is required') : null,
               ),
               const SizedBox(height: 18),
 
@@ -669,8 +720,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       activeColor: AppTheme.brandOrange,
-                      title: const Text('Mark as Urgent', style: TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.bold)),
-                      subtitle: const Text('Highlighted with an orange URGENT badge', style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                      title: Text(isArabic ? 'تمييز كإعلان عاجل' : 'Mark as Urgent', style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.bold)),
+                      subtitle: Text(isArabic ? 'يظهر مع شارة برتقالية بارزة (عاجل)' : 'Highlighted with an orange URGENT badge', style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                       value: _isUrgent,
                       onChanged: (val) => setState(() => _isUrgent = val),
                     ),
@@ -678,8 +729,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       activeColor: AppTheme.brandOrange,
-                      title: const Text('Feature this Ad (VIP)', style: TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.bold)),
-                      subtitle: const Text('Placed at the top of searches across Kuwait & GCC', style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                      title: Text(isArabic ? 'إعلان مميز (VIP)' : 'Feature this Ad (VIP)', style: const TextStyle(color: AppTheme.textDark, fontSize: 13, fontWeight: FontWeight.bold)),
+                      subtitle: Text(isArabic ? 'يظهر في أعلى نتائج البحث في جميع مناطق الكويت' : 'Placed at the top of searches across all Kuwait', style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                       value: _isFeatured,
                       onChanged: (val) => setState(() => _isFeatured = val),
                     ),
@@ -707,7 +758,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
                       : Text(
-                          context.tr('submit_ad'),
+                          isArabic ? 'نشر الإعلان الآن' : context.tr('submit_ad'),
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                 ),

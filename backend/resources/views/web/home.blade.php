@@ -58,11 +58,11 @@
                 <i class="fa-solid fa-arrow-down-up-across-line"></i>
             </a>
 
-            <!-- Country Switcher Button -->
-            <button type="button" onclick="openCountryModal()" class="p-2 text-slate-600 hover:text-slate-900 bg-slate-100 rounded-xl text-xs flex items-center gap-1" title="Select Country">
-                <span>{{ $currentCountry->flag ?? '🇰🇼' }}</span>
-                <i class="fa-solid fa-sliders text-xs"></i>
-            </button>
+            <!-- Kuwait Indicator Badge -->
+            <div class="px-2.5 py-1.5 text-slate-700 bg-slate-100 rounded-xl text-xs flex items-center gap-1.5 font-bold" title="Kuwait">
+                <span>🇰🇼</span>
+                <span class="text-[11px] font-bold">{{ ($isRtl ?? true) ? 'الكويت' : 'Kuwait' }}</span>
+            </div>
         </div>
     </div>
 </div>
@@ -74,21 +74,9 @@
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         @foreach($categories as $cat)
-            <a href="{{ route('category.show', $cat->slug) }}" class="flex flex-col sm:flex-row items-center gap-2.5 p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition group text-center sm:text-start">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                    @if($cat->slug === 'autos')
-                        <i class="fa-solid fa-car"></i>
-                    @elseif($cat->slug === 'real-estate')
-                        <i class="fa-solid fa-building"></i>
-                    @elseif($cat->slug === 'electronics')
-                        <i class="fa-solid fa-mobile-screen"></i>
-                    @elseif($cat->slug === 'jobs')
-                        <i class="fa-solid fa-briefcase"></i>
-                    @elseif($cat->slug === 'services')
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    @else
-                        <i class="fa-solid fa-box"></i>
-                    @endif
+            <a href="{{ route('category.show', $cat->slug) }}" class="flex flex-col sm:flex-row items-center gap-2.5 p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200/80 hover:border-blue-300 rounded-2xl transition group text-center sm:text-start shadow-xs">
+                <div class="w-12 h-12 rounded-2xl bg-white p-1 shadow-xs border border-slate-100 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
+                    <img src="{{ $cat->icon_url }}" alt="{{ $cat->display_name }}" class="w-10 h-10 object-contain" onerror="this.onerror=null;this.src='{{ asset('images/categories/all_categories.png') }}';">
                 </div>
                 <div class="flex-1 min-w-0">
                     <span class="text-xs font-bold text-slate-800 truncate block group-hover:text-blue-600">{{ $cat->display_name }}</span>

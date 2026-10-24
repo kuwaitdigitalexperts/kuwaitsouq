@@ -17,8 +17,8 @@ class CategoryWebController extends Controller
      */
     public function show(Request $request, string $slug)
     {
-        $countryId = session('country_id');
-        $currentCountry = $countryId ? Country::find($countryId) : Country::where('is_default', true)->first();
+        $kuwait = Country::where('code', 'KW')->first() ?? Country::where('is_active', true)->first();
+        $currentCountry = $kuwait;
 
         $category = Category::where('slug', $slug)
             ->with(['subcategories', 'filters.options'])

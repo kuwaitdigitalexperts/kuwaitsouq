@@ -170,7 +170,7 @@ class AdsProvider extends ChangeNotifier {
       _favorites = data.map((j) => AdModel.fromJson(Map<String, dynamic>.from(j as Map))).toList();
       _favoriteIds.clear();
       for (final f in _favorites) {
-        if (f.id != null) _favoriteIds.add(f.id!);
+        _favoriteIds.add(f.id);
       }
       notifyListeners();
     } catch (e) {

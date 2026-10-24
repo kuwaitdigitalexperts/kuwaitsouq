@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/categories_provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
 
 class SubcategoriesScreen extends StatefulWidget {
@@ -31,13 +32,16 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.isArabic;
     final catsProvider = context.watch<CategoriesProvider>();
     final allChildren = catsProvider.childrenOf(widget.parentId);
     final filtered = _filter.isEmpty
         ? allChildren
         : allChildren.where((c) {
             final name = (c['name'] as String? ?? '').toLowerCase();
-            return name.contains(_filter.toLowerCase());
+            final nameAr = (c['name_ar'] as String? ?? '').toLowerCase();
+            final q = _filter.toLowerCase();
+            return name.contains(q) || nameAr.contains(q);
           }).toList();
 
     return Scaffold(
@@ -52,7 +56,7 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
         titleSpacing: 0,
         title: Container(
           height: 40,
-          margin: const EdgeInsets.only(right: 14),
+          margin: const EdgeInsetsDirectional.only(end: 14),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: AppTheme.inputBg,
@@ -68,7 +72,7 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
                   style: const TextStyle(color: AppTheme.textDark, fontSize: 13),
                   onChanged: (val) => setState(() => _filter = val),
                   decoration: InputDecoration(
-                    hintText: 'Search in ${widget.title}...',
+                    hintText: isArabic ? 'البحث في ${widget.title}...' : 'Search in ${widget.title}...',
                     hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                     border: InputBorder.none,
                     isDense: true,
@@ -85,19 +89,19 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
               child: CircularProgressIndicator(color: AppTheme.primaryGreen),
             )
           : filtered.isEmpty
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.category_outlined,
                         size: 54,
                         color: AppTheme.textMuted,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
-                        'No subcategories found',
-                        style: TextStyle(
+                        isArabic ? 'لم يتم العثور على أقسام فرعية' : 'No subcategories found',
+                        style: const TextStyle(
                           color: AppTheme.textMuted,
                           fontSize: 14,
                         ),
@@ -115,19 +119,18 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final sub = filtered[index];
-                    final rawName = (sub['name'] ?? '').toString().trim();
-                    final parenMatch = RegExp(r'^([^(]+)\s*\(([^)]+)\)').firstMatch(rawName);
-                    final extractedEn = parenMatch != null ? parenMatch.group(1)!.trim() : rawName;
-                    final extractedBn = parenMatch != null ? parenMatch.group(2)!.trim() : '';
+                    final nameAr = (sub['name_ar'] ?? '').toString().trim();
+                    final nameEn = (sub['name'] ?? sub['english_name'] ?? '').toString().trim();
+                    final String displayName = isArabic
+                        ? (nameAr.isNotEmpty ? nameAr : nameEn)
+                        : (nameEn.isNotEmpty ? nameEn : nameAr);
 
-                    final String nameEn = (sub['english_name'] ?? (extractedEn.isNotEmpty ? extractedEn : rawName)).toString().trim();
-                    final String nameBn = (sub['name_bn'] ?? sub['bengali_name'] ?? extractedBn).toString().trim();
-                    final String displayName = (nameBn.isNotEmpty && nameBn.toLowerCase() != nameEn.toLowerCase())
-                        ? '$nameEn ($nameBn)'
-                        : (nameEn.isNotEmpty ? nameEn : rawName);
                     final String? imageUrl = sub['icon_url'] ?? sub['image'];
                     final int totalAds = sub['total_ads'] ?? 0;
                     final int subId = sub['id'] as int;
+                    final String adsCountText = isArabic
+                        ? (totalAds > 0 ? '$totalAds إعلان' : '0 إعلان')
+                        : (totalAds > 0 ? '$totalAds ${totalAds == 1 ? "ad" : "ads"}' : '0 ads');
 
                     return InkWell(
                       onTap: () {
@@ -161,21 +164,37 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: const EdgeInsets.all(8),
-                              child: imageUrl != null && imageUrl.isNotEmpty
-                                  ? CachedNetworkImage(
-                                      imageUrl: imageUrl,
-                                      fit: BoxFit.contain,
-                                      errorWidget: (_, __, ___) => const Icon(
-                                        Icons.image_outlined,
+                              child: Builder(
+                                builder: (_) {
+                                  final slug = (sub['slug'] as String? ?? '').replaceAll('-', '_');
+                                  final iconName = (sub['icon'] as String? ?? '').replaceAll('.png', '');
+                                  final primaryAsset = slug.isNotEmpty
+                                      ? 'assets/images/categories/$slug.png'
+                                      : 'assets/images/categories/$iconName.png';
+                                  return Image.asset(
+                                    primaryAsset,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) {
+                                      if (imageUrl != null && imageUrl.isNotEmpty) {
+                                        return CachedNetworkImage(
+                                          imageUrl: imageUrl,
+                                          fit: BoxFit.contain,
+                                          errorWidget: (_, __, ___) => const Icon(
+                                            Icons.category_outlined,
+                                            color: AppTheme.primaryGreen,
+                                            size: 20,
+                                          ),
+                                        );
+                                      }
+                                      return const Icon(
+                                        Icons.category_outlined,
                                         color: AppTheme.primaryGreen,
                                         size: 20,
-                                      ),
-                                    )
-                                  : const Icon(
-                                      Icons.image_outlined,
-                                      color: AppTheme.primaryGreen,
-                                      size: 20,
-                                    ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -192,9 +211,7 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    totalAds > 0
-                                        ? '$totalAds إعلان في الكويت'
-                                        : '0 إعلان',
+                                    adsCountText,
                                     style: const TextStyle(
                                       color: AppTheme.textMuted,
                                       fontSize: 12,
@@ -203,8 +220,8 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(
-                              Icons.chevron_right,
+                            Icon(
+                              isArabic ? Icons.chevron_left : Icons.chevron_right,
                               color: AppTheme.textMuted,
                               size: 20,
                             ),

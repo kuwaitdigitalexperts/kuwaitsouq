@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/widgets/auth_bottom_sheet.dart';
@@ -51,10 +52,12 @@ class HomeHeroBanner extends StatelessWidget {
                     ),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'سوق الكويت والخليج - بيع واشتري كل شي',
-                      style: TextStyle(
+                      context.isArabic
+                          ? 'سوق الكويت الأول - بيع واشتري كل شي'
+                          : "Kuwait's #1 Marketplace - Buy & Sell Everything",
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

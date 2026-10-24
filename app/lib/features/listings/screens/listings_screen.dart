@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../ads/widgets/ad_card.dart';
@@ -32,9 +33,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
-        title: const Text(
-          'إعلاناتي (Listings)',
-          style: TextStyle(
+        title: Text(
+          context.tr('nav_my_ads'),
+          style: const TextStyle(
             color: AppTheme.textDark,
             fontWeight: FontWeight.w900,
             fontSize: 18,
@@ -46,7 +47,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
             icon: const Icon(Icons.phone_outlined, color: Color(0xFF2563EB)),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('الاتصال بالدعم الفني: ${AppConstants.supportPhone}')),
+                SnackBar(content: Text('${context.isArabic ? "الاتصال بالدعم الفني: " : "Support Phone: "}${AppConstants.supportPhone}')),
               );
             },
           ),
@@ -88,9 +89,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Text(
-                          'إعلاناتي',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                        Text(
+                          context.tr('nav_my_ads'),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                         ),
                       ],
                     ),
@@ -108,12 +109,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.visibility_outlined, color: Color(0xFF0D9488), size: 24),
-                        SizedBox(height: 10),
-                        Text(
+                        const Icon(Icons.visibility_outlined, color: Color(0xFF0D9488), size: 24),
+                        const SizedBox(height: 10),
+                        const Text(
                           '1,280',
                           style: TextStyle(
                             fontSize: 20,
@@ -121,10 +122,10 @@ class _ListingsScreenState extends State<ListingsScreen> {
                             color: Color(0xFF0D9488),
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'المشاهدات',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                          context.tr('views_title'),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                         ),
                       ],
                     ),
@@ -149,18 +150,18 @@ class _ListingsScreenState extends State<ListingsScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Icon(Icons.add_a_photo, color: Color(0xFFF59E0B), size: 24),
                               Icon(Icons.add, color: Color(0xFFF59E0B), size: 20),
                             ],
                           ),
-                          SizedBox(height: 10),
-                          Text(
+                          const SizedBox(height: 10),
+                          const Text(
                             '+',
                             style: TextStyle(
                               fontSize: 20,
@@ -168,10 +169,10 @@ class _ListingsScreenState extends State<ListingsScreen> {
                               color: Color(0xFFF59E0B),
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
-                            'أضف إعلان جديد',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                            context.tr('add_new_ad'),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                           ),
                         ],
                       ),
@@ -190,12 +191,12 @@ class _ListingsScreenState extends State<ListingsScreen> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.star, color: Color(0xFFF59E0B), size: 24),
-                        SizedBox(height: 10),
-                        Text(
+                        const Icon(Icons.star, color: Color(0xFFF59E0B), size: 24),
+                        const SizedBox(height: 10),
+                        const Text(
                           '5.0',
                           style: TextStyle(
                             fontSize: 20,
@@ -203,10 +204,10 @@ class _ListingsScreenState extends State<ListingsScreen> {
                             color: Color(0xFFF59E0B),
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'التقييم العام',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                          context.tr('rating_title'),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                         ),
                       ],
                     ),
@@ -229,7 +230,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   _buildMenuItem(
                     icon: Icons.article_outlined,
                     iconColor: const Color(0xFF2563EB),
-                    title: 'إعلاناتي النشطة',
+                    title: context.tr('active_listings'),
                     trailing: '${myListings.length}',
                     onTap: () {},
                   ),
@@ -237,7 +238,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   _buildMenuItem(
                     icon: Icons.favorite_border,
                     iconColor: const Color(0xFFE11D48),
-                    title: 'الإعلانات المفضلة',
+                    title: context.tr('favorite_ads'),
                     trailing: '12',
                     onTap: () => context.push('/saved'),
                   ),
@@ -245,7 +246,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   _buildMenuItem(
                     icon: Icons.drafts_outlined,
                     iconColor: const Color(0xFF64748B),
-                    title: 'المسودات المحفوظة',
+                    title: context.tr('saved_drafts'),
                     trailing: '0',
                     onTap: () {},
                   ),
@@ -253,7 +254,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   _buildMenuItem(
                     icon: Icons.notifications_active_outlined,
                     iconColor: const Color(0xFF0D9488),
-                    title: 'تنبيهات البحث المحفوظة',
+                    title: context.tr('saved_search_alerts'),
                     trailing: '3',
                     onTap: () {},
                   ),
@@ -261,7 +262,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
                   _buildMenuItem(
                     icon: Icons.rocket_launch_outlined,
                     iconColor: const Color(0xFFF59E0B),
-                    title: 'الإعلانات المميزة والترويج',
+                    title: context.tr('promoted_ads'),
                     trailing: '🚀',
                     onTap: () {},
                   ),
@@ -272,9 +273,9 @@ class _ListingsScreenState extends State<ListingsScreen> {
             const SizedBox(height: 18),
 
             // Active Listings Feed
-            const Text(
-              'الإعلانات المسجلة',
-              style: TextStyle(
+            Text(
+              context.tr('registered_listings'),
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
                 color: AppTheme.textDark,

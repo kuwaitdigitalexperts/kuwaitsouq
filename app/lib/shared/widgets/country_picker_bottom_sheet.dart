@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/country_codes.dart';
+import '../../core/localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class CountryPickerBottomSheet extends StatefulWidget {
@@ -66,6 +67,7 @@ class _CountryPickerBottomSheetState extends State<CountryPickerBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isAr = context.isArabic;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
@@ -92,9 +94,9 @@ class _CountryPickerBottomSheetState extends State<CountryPickerBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Select Country Code',
-                  style: TextStyle(
+                Text(
+                  isAr ? 'اختر رمز الدولة' : 'Select Country Code',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textDark,
@@ -121,7 +123,7 @@ class _CountryPickerBottomSheetState extends State<CountryPickerBottomSheet> {
                 controller: _searchController,
                 autofocus: false,
                 decoration: InputDecoration(
-                  hintText: 'Search country name or code (+91, +965, etc.)',
+                  hintText: isAr ? 'ابحث عن اسم الدولة أو الرمز (+965, +966...)' : 'Search country name or code (+965, +966, etc.)',
                   hintStyle: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
                   prefixIcon: const Icon(Icons.search, color: AppTheme.textMuted, size: 20),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -142,10 +144,10 @@ class _CountryPickerBottomSheetState extends State<CountryPickerBottomSheet> {
           // Country List
           Expanded(
             child: _filtered.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
-                      'No matching country code found',
-                      style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+                      isAr ? 'لم يتم العثور على نتائج' : 'No matching country code found',
+                      style: const TextStyle(color: AppTheme.textMuted, fontSize: 14),
                     ),
                   )
                 : ListView.separated(

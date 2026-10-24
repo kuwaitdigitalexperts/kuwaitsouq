@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/ads_provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 
 class BoostAdScreen extends StatefulWidget {
@@ -14,44 +15,54 @@ class BoostAdScreen extends StatefulWidget {
 class _BoostAdScreenState extends State<BoostAdScreen> {
   int _selectedPlanIndex = 2; // Default to Featured Plan
 
-  final List<Map<String, dynamic>> _plans = [
+  List<Map<String, dynamic>> _getPlans(bool isAr) => [
     {
-      'title': 'Basic',
-      'price': '2.000 د.ك',
-      'days': '3 Days',
-      'multiplier': '2x Views',
+      'title': isAr ? 'الباقة الأساسية' : 'Basic',
+      'price': isAr ? '2.000 د.ك' : '2.000 KD',
+      'days': isAr ? '3 أيام' : '3 Days',
+      'multiplier': isAr ? 'مشاهدات 2x' : '2x Views',
       'badge': null,
-      'features': ['Standard highlight', 'Appear in search suggestions'],
+      'features': isAr
+          ? ['تمييز قياسي بلون بارز', 'الظهور في اقتراحات البحث']
+          : ['Standard highlight', 'Appear in search suggestions'],
     },
     {
-      'title': 'Standard',
-      'price': '5.000 د.ك',
-      'days': '7 Days',
-      'multiplier': '5x Views',
+      'title': isAr ? 'الباقة المتقدمة' : 'Standard',
+      'price': isAr ? '5.000 د.ك' : '5.000 KD',
+      'days': isAr ? '7 أيام' : '7 Days',
+      'multiplier': isAr ? 'مشاهدات 5x' : '5x Views',
       'badge': null,
-      'features': ['Top of Category listing', 'Blue badge highlight', 'Priority customer support'],
+      'features': isAr
+          ? ['أعلى قائمة القسم', 'شارة تمييز زرقاء', 'أولوية دعم العملاء']
+          : ['Top of Category listing', 'Blue badge highlight', 'Priority customer support'],
     },
     {
-      'title': 'Featured',
-      'price': '10.000 د.ك',
-      'days': '15 Days',
-      'multiplier': '10x Views',
-      'badge': 'MOST POPULAR',
-      'features': ['Home Page Popular carousel', 'Top of Category for 15 days', 'Featured rocket badge', 'SMS & WhatsApp alert to buyers'],
+      'title': isAr ? 'الباقة المميزة' : 'Featured',
+      'price': isAr ? '10.000 د.ك' : '10.000 KD',
+      'days': isAr ? '15 يوماً' : '15 Days',
+      'multiplier': isAr ? 'مشاهدات 10x' : '10x Views',
+      'badge': isAr ? 'الأكثر طلباً' : 'MOST POPULAR',
+      'features': isAr
+          ? ['شريط الإعلانات الشائعة بالصفحة الرئيسية', 'أعلى القسم لمدة 15 يوماً', 'شارة الصاروخ المميز', 'تنبيهات للمشترين عبر الرسائل والواتساب']
+          : ['Home Page Popular carousel', 'Top of Category for 15 days', 'Featured rocket badge', 'SMS & WhatsApp alert to buyers'],
     },
     {
-      'title': 'Premium VIP',
-      'price': '20.000 د.ك',
-      'days': '30 Days',
-      'multiplier': '20x Views',
-      'badge': 'MAX RESULTS',
-      'features': ['VIP Gold badge on ad', 'Fixed top spot in Kuwait feed', 'Auto-refresh every 3 days', 'Urgent Deal badge included'],
+      'title': isAr ? 'باقة VIP الذهبية' : 'Premium VIP',
+      'price': isAr ? '20.000 د.ك' : '20.000 KD',
+      'days': isAr ? '30 يوماً' : '30 Days',
+      'multiplier': isAr ? 'مشاهدات 20x' : '20x Views',
+      'badge': isAr ? 'أعلى نتائج' : 'MAX RESULTS',
+      'features': isAr
+          ? ['شارة VIP الذهبية على الإعلان', 'موقع ثابت في صدارة موجز الكويت', 'تحديث تلقائي كل 3 أيام', 'شارة عرض عاجل مشمولة مجاناً']
+          : ['VIP Gold badge on ad', 'Fixed top spot in Kuwait feed', 'Auto-refresh every 3 days', 'Urgent Deal badge included'],
     },
   ];
 
   @override
   Widget build(BuildContext context) {
-    final selectedPlan = _plans[_selectedPlanIndex];
+    final isArabic = context.isArabic;
+    final plans = _getPlans(isArabic);
+    final selectedPlan = plans[_selectedPlanIndex];
 
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
@@ -62,9 +73,9 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
           icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: const Text(
-          'Boost Your Ad',
-          style: TextStyle(
+        title: Text(
+          isArabic ? 'ترقية وتمييز الإعلان' : 'Boost Your Ad',
+          style: const TextStyle(
             color: AppTheme.textDark,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -89,22 +100,24 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
               ),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'بيع أسرع 10 مرات في الكويت والخليج',
-                          style: TextStyle(
+                          isArabic ? 'بيع أسرع 10 مرات في جميع مناطق الكويت' : 'Sell 10x Faster Across All Kuwait',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'ميز إعلانك واجذب آلاف المشترين والاتصالات المباشرة فوراً عبر واتساب.',
-                          style: TextStyle(
+                          isArabic
+                              ? 'ميز إعلانك واجذب آلاف المشترين والاتصالات المباشرة فوراً عبر واتساب.'
+                              : 'Highlight your listing and get thousands of direct inquiries via WhatsApp.',
+                          style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,
                             height: 1.3,
@@ -127,9 +140,9 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
             ),
             const SizedBox(height: 20),
 
-            const Text(
-              'Select Boost Plan',
-              style: TextStyle(
+            Text(
+              isArabic ? 'اختر باقة التمييز' : 'Select Boost Plan',
+              style: const TextStyle(
                 color: AppTheme.textDark,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -138,8 +151,8 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
             const SizedBox(height: 12),
 
             // Plan Cards
-            ...List.generate(_plans.length, (index) {
-              final plan = _plans[index];
+            ...List.generate(plans.length, (index) {
+              final plan = plans[index];
               final isSelected = _selectedPlanIndex == index;
               final isPopular = plan['badge'] != null;
 
@@ -215,7 +228,7 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
                       ),
                       const SizedBox(height: 8),
                       Padding(
-                        padding: const EdgeInsets.only(left: 32),
+                        padding: const EdgeInsetsDirectional.only(start: 32),
                         child: Row(
                           children: [
                             Container(
@@ -238,7 +251,7 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
                       ),
                       const SizedBox(height: 8),
                       Padding(
-                        padding: const EdgeInsets.only(left: 32),
+                        padding: const EdgeInsetsDirectional.only(start: 32),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: (plan['features'] as List<String>).map((feat) {
@@ -292,19 +305,21 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
                           const Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 48),
                           const SizedBox(height: 12),
                           Text(
-                            'Order Summary: ${selectedPlan['title']} Plan',
+                            isArabic ? 'ملخص الطلب: باقة ${selectedPlan['title']}' : 'Order Summary: ${selectedPlan['title']} Plan',
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Total Amount: ${selectedPlan['price']}',
+                            isArabic ? 'المبلغ الإجمالي: ${selectedPlan['price']}' : 'Total Amount: ${selectedPlan['price']}',
                             style: const TextStyle(fontSize: 16, color: AppTheme.primaryGreen, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'الدفع الآمن الفوري عبر بوابة كي نت (KNET) أو البطاقات الائتمانية.',
+                          Text(
+                            isArabic
+                                ? 'الدفع الآمن الفوري عبر بوابة كي نت (KNET) أو البطاقات الائتمانية.'
+                                : 'Instant secure payment via KNET or Credit/Debit Cards.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                            style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
@@ -323,17 +338,24 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
                                 if (!ctx.mounted) return;
                                 Navigator.pop(ctx);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Color(0xFF059669),
+                                  SnackBar(
+                                    backgroundColor: const Color(0xFF059669),
                                     behavior: SnackBarBehavior.floating,
-                                    content: Text('تم تفعيل تمييز الإعلان وترقيته بنجاح عبر بوابة الدفع (KNET)! 🚀'),
+                                    content: Text(
+                                      isArabic
+                                          ? 'تم تفعيل تمييز الإعلان وترقيته بنجاح عبر بوابة الدفع (KNET)! 🚀'
+                                          : 'Ad boosted successfully via KNET payment gateway! 🚀',
+                                    ),
                                   ),
                                 );
                                 if (context.mounted) {
                                   Navigator.of(context).maybePop();
                                 }
                               },
-                              child: const Text('دفع فوري عبر كي نت / البطاقة 💳', style: TextStyle(fontWeight: FontWeight.bold)),
+                              child: Text(
+                                isArabic ? 'دفع فوري عبر كي نت / البطاقة 💳' : 'Pay with KNET / Card 💳',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ],
@@ -342,7 +364,7 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
                   );
                 },
                 child: Text(
-                  'المتابعة للدفع (${selectedPlan['price']})',
+                  isArabic ? 'المتابعة للدفع (${selectedPlan['price']})' : 'Proceed to Payment (${selectedPlan['price']})',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -350,14 +372,16 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
             const SizedBox(height: 18),
 
             // Payment Trust Badges
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.lock_outline, size: 14, color: AppTheme.textMuted),
-                SizedBox(width: 4),
+                const Icon(Icons.lock_outline, size: 14, color: AppTheme.textMuted),
+                const SizedBox(width: 4),
                 Text(
-                  'دفع إلكتروني آمن 100% · KNET, Apple Pay, Visa, MasterCard',
-                  style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
+                  isArabic
+                      ? 'دفع إلكتروني آمن 100% · KNET, Apple Pay, Visa, MasterCard'
+                      : '100% Secure Payment · KNET, Apple Pay, Visa, MasterCard',
+                  style: const TextStyle(color: AppTheme.textMuted, fontSize: 11),
                 ),
               ],
             ),

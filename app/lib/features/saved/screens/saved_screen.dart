@@ -25,6 +25,7 @@ class _SavedScreenState extends State<SavedScreen> {
   Widget build(BuildContext context) {
     final adsProvider = context.watch<AdsProvider>();
     final favorites = adsProvider.favorites;
+    final isArabic = context.isArabic;
 
     return DefaultTabController(
       length: 2,
@@ -38,7 +39,7 @@ class _SavedScreenState extends State<SavedScreen> {
             onPressed: () => Navigator.of(context).maybePop(),
           ),
           title: Text(
-            context.tr('saved_ads_title'),
+            isArabic ? 'الإعلانات المحفوظة' : 'Saved Ads',
             style: const TextStyle(
               color: AppTheme.textDark,
               fontSize: 18,
@@ -52,8 +53,8 @@ class _SavedScreenState extends State<SavedScreen> {
             unselectedLabelColor: AppTheme.textMuted,
             labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             tabs: [
-              Tab(text: '${context.tr('saved_ads')} (${favorites.length})'),
-              Tab(text: context.tr('nav_search')),
+              Tab(text: isArabic ? 'المفضلة (${favorites.length})' : 'Favorites (${favorites.length})'),
+              Tab(text: isArabic ? 'عمليات البحث المحفوظة' : 'Saved Searches'),
             ],
           ),
         ),
@@ -63,8 +64,10 @@ class _SavedScreenState extends State<SavedScreen> {
             favorites.isEmpty
                 ? _buildEmptyState(
                     icon: Icons.favorite_border,
-                    title: context.tr('no_saved_ads'),
-                    message: 'يمكنك حفظ الإعلانات بالضغط على أيقونة القلب في أي إعلان لمتابعتها لاحقاً',
+                    title: isArabic ? 'لا توجد إعلانات محفوظة' : 'No Saved Ads',
+                    message: isArabic
+                        ? 'يمكنك حفظ الإعلانات بالضغط على أيقونة القلب في أي إعلان لمتابعتها لاحقاً'
+                        : 'Tap the heart icon on any listing to save it here for later reference',
                   )
                 : RefreshIndicator(
                     onRefresh: () => adsProvider.fetchFavorites(),
@@ -81,8 +84,10 @@ class _SavedScreenState extends State<SavedScreen> {
             // Tab 2: Saved Searches
             _buildEmptyState(
               icon: Icons.search,
-              title: 'عمليات البحث المحفوظة',
-              message: 'احفظ شروط البحث لتحصل على تنبيهات فورية عند إضافة إعلانات جديدة تناسبك',
+              title: isArabic ? 'عمليات البحث المحفوظة' : 'Saved Searches',
+              message: isArabic
+                  ? 'احفظ شروط البحث لتحصل على تنبيهات فورية عند إضافة إعلانات جديدة تناسبك'
+                  : 'Save your search criteria to receive instant alerts when new matching ads are listed',
             ),
           ],
         ),

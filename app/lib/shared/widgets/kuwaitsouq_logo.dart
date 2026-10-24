@@ -111,7 +111,7 @@ class KuwaitSouqLogo extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 1.0),
                 child: Text(
-                  'سوق الكويت والخليج',
+                  'سوق الكويت الأول',
                   style: TextStyle(
                     color: isWhite ? const Color(0xFF34D399) : const Color(0xFF059669),
                     fontSize: fontSize * 0.44,

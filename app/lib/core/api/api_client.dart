@@ -259,9 +259,19 @@ class ApiClient {
     return [];
   }
 
-  // Locations (backward compatible)
+  // Kuwait Locations & Governorates
   Future<List<dynamic>> getLocations() async {
-    return await getCountries();
+    try {
+      final res = await _dio.get('/locations');
+      if (res.data is List) return res.data;
+      if (res.data is Map && res.data['data'] != null) {
+        final inner = res.data['data'];
+        return inner is List ? inner : [];
+      }
+    } catch (e) {
+      debugPrint('🚨 [ApiClient] getLocations error: $e');
+    }
+    return [];
   }
 
   // Messages

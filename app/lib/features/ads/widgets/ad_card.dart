@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/models/ad_model.dart';
-import '../../../shared/theme/app_theme.dart';
 
 class AdCard extends StatelessWidget {
   final AdModel ad;
@@ -11,9 +11,12 @@ class AdCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currency = ad.currency.isNotEmpty ? ad.currency : 'د.ك';
+    final isAr = context.isArabic;
+    final currency = ad.localizedCurrency(isAr);
     final priceStr = '${ad.price.toStringAsFixed(ad.price.truncateToDouble() == ad.price ? 0 : 2)} $currency';
-    final locationText = ad.locationName.isNotEmpty ? ad.locationName : 'الكويت';
+    final locationText = ad.localizedLocation(isAr);
+    final categoryText = ad.localizedCategory(isAr);
+    final titleText = ad.localizedTitle(isAr);
 
     return InkWell(
       onTap: () => context.push('/ads/${ad.id}'),
@@ -42,7 +45,7 @@ class AdCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    ad.createdAt != null ? 'منذ فترة' : 'الآن',
+                    ad.createdAt != null ? context.tr('time_ago') : context.tr('time_now'),
                     style: const TextStyle(
                       fontSize: 11,
                       color: Color(0xFF94A3B8),
@@ -56,7 +59,7 @@ class AdCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      ad.condition == 'new' ? 'جديد' : 'مستعمل',
+                      ad.condition == 'new' ? context.tr('condition_new') : context.tr('condition_used'),
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -163,14 +166,14 @@ class AdCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('🚀', style: TextStyle(fontSize: 12)),
-                            SizedBox(width: 3),
+                            const Text('🚀', style: TextStyle(fontSize: 12)),
+                            const SizedBox(width: 3),
                             Text(
-                              'مميز',
-                              style: TextStyle(
+                              context.tr('featured_badge'),
+                              style: const TextStyle(
                                 color: Color(0xFFE11D48),
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -205,7 +208,7 @@ class AdCard extends StatelessWidget {
 
                   // Ad Title
                   Text(
-                    ad.title,
+                    titleText,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -234,7 +237,7 @@ class AdCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (ad.categoryName.isNotEmpty) ...[
+                      if (categoryText.isNotEmpty) ...[
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -243,7 +246,7 @@ class AdCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            ad.categoryName,
+                            categoryText,
                             style: const TextStyle(
                               color: Color(0xFF475569),
                               fontSize: 10,
@@ -265,7 +268,7 @@ class AdCard extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('الاتصال بالمعلن...')),
+                              SnackBar(content: Text(isAr ? 'الاتصال بالمعلن...' : 'Calling seller...')),
                             );
                           },
                           borderRadius: BorderRadius.circular(10),
@@ -275,14 +278,14 @@ class AdCard extends StatelessWidget {
                               color: const Color(0xFF2563EB),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.phone, color: Colors.white, size: 13),
-                                SizedBox(width: 5),
+                                const Icon(Icons.phone, color: Colors.white, size: 13),
+                                const SizedBox(width: 5),
                                 Text(
-                                  'اتصال',
-                                  style: TextStyle(
+                                  context.tr('call_action'),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
@@ -301,7 +304,7 @@ class AdCard extends StatelessWidget {
                         child: InkWell(
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('فتح محادثة واتساب...')),
+                              SnackBar(content: Text(isAr ? 'فتح محادثة واتساب...' : 'Opening WhatsApp...')),
                             );
                           },
                           borderRadius: BorderRadius.circular(10),
@@ -311,14 +314,14 @@ class AdCard extends StatelessWidget {
                               color: const Color(0xFF25D366),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.chat_bubble_outline, color: Colors.white, size: 13),
-                                SizedBox(width: 5),
+                                const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 13),
+                                const SizedBox(width: 5),
                                 Text(
-                                  'واتساب',
-                                  style: TextStyle(
+                                  context.tr('whatsapp_action'),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,

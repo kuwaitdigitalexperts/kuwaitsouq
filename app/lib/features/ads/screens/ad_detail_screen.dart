@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 
@@ -15,7 +16,6 @@ class AdDetailScreen extends StatefulWidget {
 
 class _AdDetailScreenState extends State<AdDetailScreen> {
   int _currentImageIndex = 0;
-  bool _isSaved = false;
 
   @override
   void initState() {
@@ -33,9 +33,10 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) {
-          bool isSubmitting = false;
+      builder: (ctx) {
+        bool isSubmitting = false;
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
 
           return Container(
             decoration: const BoxDecoration(
@@ -79,13 +80,15 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'تقرير كارفكس لهذه المركبة 🚗',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                            Text(
+                              context.tr('carfax_title'),
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              adTitle != null ? 'فحص: $adTitle' : 'فحص السجل التاريخي والحوادث السابقة',
+                              adTitle != null 
+                                  ? '${context.isArabic ? "فحص: " : "Inspect: "}$adTitle'
+                                  : context.tr('carfax_sub'),
                               style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                             ),
                           ],
@@ -98,8 +101,8 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                     controller: vinCtrl,
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
-                      labelText: 'رقم الشاصي / الهيكل (VIN)',
-                      hintText: 'إذا لم يتوفر، اترك فارغاً وسنتحقق من المعلن',
+                      labelText: context.isArabic ? 'رقم الشاصي / الهيكل (VIN)' : 'VIN / Chassis Number',
+                      hintText: context.isArabic ? 'إذا لم يتوفر، اترك فارغاً وسنتحقق من المعلن' : 'Optional: leave blank to request from seller',
                       prefixIcon: const Icon(Icons.pin, size: 20),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -110,7 +113,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                     controller: phoneCtrl,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      labelText: 'رقم هاتفك لاستلام تقرير كارفكس',
+                      labelText: context.isArabic ? 'رقم هاتفك لاستلام تقرير كارفكس' : 'Phone Number for WhatsApp Report',
                       prefixIcon: const Icon(Icons.phone_outlined, size: 20),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -131,7 +134,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                             final phone = phoneCtrl.text.trim();
                             if (phone.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('يرجى إدخال رقم هاتفك لاستلام التقرير')),
+                                SnackBar(content: Text(context.isArabic ? 'يرجى إدخال رقم هاتفك لاستلام التقرير' : 'Please enter your phone number')),
                               );
                               return;
                             }
@@ -148,25 +151,29 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                 backgroundColor: const Color(0xFF0F172A),
                                 behavior: SnackBarBehavior.floating,
                                 content: Text(
-                                  res['message'] ?? 'تم تسجيل طلب فحص كارفكس! سيصلك التقرير عبر الواتساب فور اكتماله.',
+                                  res['message'] ?? (context.isArabic 
+                                      ? 'تم تسجيل طلب فحص كارفكس! سيصلك التقرير عبر الواتساب فور اكتماله.' 
+                                      : 'CarFax request submitted! You will receive the report via WhatsApp.'),
                                 ),
                               ),
                             );
                           },
-                    child: const Text('طلب تقرير كارفكس الشامل 📄', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+                    child: Text(context.isArabic ? 'طلب تقرير كارفكس الشامل 📄' : 'Request Full Inspection Report 📄', style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
             ),
           );
         },
-      ),
-    );
+      );
+    },
+  );
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AdsProvider>();
+    final isAr = context.isArabic;
     final ad = provider.currentAd;
 
     if (ad == null && provider.loading) {
@@ -176,10 +183,10 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
       );
     }
 
-    final currency = ad?.currency.isNotEmpty == true ? ad!.currency : 'د.ك';
+    final currency = ad != null ? ad.localizedCurrency(isAr) : (isAr ? 'د.ك' : 'KD');
     final priceStr = ad != null
         ? '${ad.price.toStringAsFixed(ad.price.truncateToDouble() == ad.price ? 0 : 2)} $currency'
-        : '0 د.ك';
+        : (isAr ? '0 د.ك' : '0 KD');
     final images = ad?.images ?? [];
 
     return Scaffold(
@@ -265,7 +272,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                           SnackBar(
                                             backgroundColor: const Color(0xFF1E293B),
                                             behavior: SnackBarBehavior.floating,
-                                            content: Text(nowFav ? 'تمت إضافة الإعلان إلى المفضلة ❤️' : 'تمت إزالة الإعلان من المفضلة'),
+                                            content: Text(nowFav ? context.tr('added_to_favorites') : context.tr('removed_from_favorites')),
                                           ),
                                         );
                                       },
@@ -278,7 +285,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                       icon: const Icon(Icons.share_outlined, color: AppTheme.textDark),
                                       onPressed: () {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('تم نسخ رابط الإعلان')),
+                                          SnackBar(content: Text(context.tr('ad_link_copied'))),
                                         );
                                       },
                                     ),
@@ -371,13 +378,13 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFBFDBFE)),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.trending_down, color: Color(0xFF2563EB), size: 18),
-                            SizedBox(width: 8),
+                            const Icon(Icons.trending_down, color: Color(0xFF2563EB), size: 18),
+                            const SizedBox(width: 8),
                             Text(
-                              'تنبيه بانخفاض السعر: وفر مع هذا العرض',
-                              style: TextStyle(
+                              context.tr('price_drop_alert'),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1E40AF),
@@ -410,9 +417,9 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               color: const Color(0xFFDCFCE7),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Text(
-                              'قابل للتفاوض',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+                            child: Text(
+                              isAr ? 'قابل للتفاوض' : 'Negotiable',
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
                             ),
                           ),
                         ],
@@ -422,7 +429,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
                       // Title
                       Text(
-                        ad?.title ?? 'إعلان في سوق الكويت',
+                        ad != null ? ad.localizedTitle(isAr) : (isAr ? 'إعلان في سوق الكويت' : 'KuwaitSouq Listing'),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -439,7 +446,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           const Icon(Icons.location_on, size: 14, color: Color(0xFFE11D48)),
                           const SizedBox(width: 4),
                           Text(
-                            ad?.locationName.isNotEmpty == true ? ad!.locationName : 'الكويت',
+                            ad != null ? ad.localizedLocation(isAr) : (isAr ? 'الكويت' : 'Kuwait'),
                             style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 10),
@@ -447,7 +454,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           const SizedBox(width: 10),
                           const Icon(Icons.access_time, size: 14, color: Color(0xFF94A3B8)),
                           const SizedBox(width: 4),
-                          const Text('منذ ساعتين', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                          Text(isAr ? 'منذ ساعتين' : '2 hours ago', style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                         ],
                       ),
 
@@ -464,16 +471,30 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'المواصفات والتفاصيل',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textDark),
+                            Text(
+                              context.tr('specifications'),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textDark),
                             ),
                             const SizedBox(height: 12),
-                            _buildSpecRow('الحالة', ad?.condition == 'new' ? 'جديد بالكرتون' : 'مستعمل بحالة ممتازة'),
-                            _buildSpecRow('القسم', ad?.categoryName.isNotEmpty == true ? ad!.categoryName : 'سيارات ودبابات'),
-                            _buildSpecRow('سنة الصنع', '2023'),
-                            _buildSpecRow('المدينة', ad?.locationName ?? 'الكويت'),
-                            _buildSpecRow('طريقة الدفع', 'كاش أو تحويل بنكي'),
+                            _buildSpecRow(
+                              isAr ? 'الحالة' : 'Condition',
+                              ad?.condition == 'new' 
+                                  ? (isAr ? 'جديد بالكرتون' : 'Brand New') 
+                                  : (isAr ? 'مستعمل بحالة ممتازة' : 'Used - Excellent Condition'),
+                            ),
+                            _buildSpecRow(
+                              isAr ? 'القسم' : 'Category',
+                              ad != null ? ad.localizedCategory(isAr) : (isAr ? 'سيارات ودبابات' : 'Vehicles'),
+                            ),
+                            _buildSpecRow(isAr ? 'سنة الصنع' : 'Year', '2023'),
+                            _buildSpecRow(
+                              isAr ? 'المدينة' : 'City',
+                              ad != null ? ad.localizedLocation(isAr) : (isAr ? 'الكويت' : 'Kuwait'),
+                            ),
+                            _buildSpecRow(
+                              isAr ? 'طريقة الدفع' : 'Payment',
+                              isAr ? 'كاش أو تحويل بنكي' : 'Cash or Bank Transfer',
+                            ),
                           ],
                         ),
                       ),
@@ -482,7 +503,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
 
                       // CarFax Vehicle Check Banner
                       InkWell(
-                        onTap: () => _showCarFaxModal(context, ad?.title),
+                        onTap: () => _showCarFaxModal(context, ad?.localizedTitle(isAr)),
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
                           padding: const EdgeInsets.all(14),
@@ -495,26 +516,26 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: const Color(0xFFFCD34D)),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.car_crash, color: Color(0xFFD97706), size: 24),
-                              SizedBox(width: 10),
+                              const Icon(Icons.car_crash, color: Color(0xFFD97706), size: 24),
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'فحص كارفكس للمركبة (CarFax Vehicle Report)',
-                                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF78350F)),
+                                      context.tr('carfax_title'),
+                                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF78350F)),
                                     ),
                                     Text(
-                                      'تحقق من تاريخ الصيانة والحوادث السابقة لهذه المركبة',
-                                      style: TextStyle(fontSize: 10.5, color: Color(0xFF92400E)),
+                                      context.tr('carfax_sub'),
+                                      style: const TextStyle(fontSize: 10.5, color: Color(0xFF92400E)),
                                     ),
                                   ],
                                 ),
                               ),
-                              Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF78350F)),
+                              const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF78350F)),
                             ],
                           ),
                         ),
@@ -533,13 +554,13 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.chat_outlined, color: Color(0xFF2563EB), size: 18),
-                                SizedBox(width: 6),
+                                const Icon(Icons.chat_outlined, color: Color(0xFF2563EB), size: 18),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'اسأل المعلن بنقرة واحدة (Quick Questions)',
-                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                                  context.tr('ask_lister'),
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                                 ),
                               ],
                             ),
@@ -548,10 +569,10 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                               spacing: 8,
                               runSpacing: 8,
                               children: [
-                                _buildChip('هل السلعة متوفرة؟', ad?.userId),
-                                _buildChip('ما هو السعر النهائي؟', ad?.userId),
-                                _buildChip('هل تقبل البدل؟', ad?.userId),
-                                _buildChip('أين موقع المعاينة؟', ad?.userId),
+                                _buildChip(isAr ? 'هل السلعة متوفرة؟' : 'Is this item available?', ad?.userId),
+                                _buildChip(isAr ? 'ما هو السعر النهائي؟' : 'What is the final price?', ad?.userId),
+                                _buildChip(isAr ? 'هل تقبل البدل؟' : 'Are you open to trade-in?', ad?.userId),
+                                _buildChip(isAr ? 'أين موقع المعاينة؟' : 'Where can I inspect the item?', ad?.userId),
                               ],
                             ),
                           ],
@@ -571,15 +592,17 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'الوصف',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textDark),
+                            Text(
+                              context.tr('ad_description_title'),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textDark),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              ad?.description.isNotEmpty == true
-                                  ? ad!.description
-                                  : 'حالة ممتازة جداً، استعمال خفيف، جاهز للمعاينة والتسليم الفوري في الكويت. تواصل عبر الواتساب أو الاتصال للمزيد من التفاصيل.',
+                              ad != null && ad.localizedDescription(isAr).isNotEmpty
+                                  ? ad.localizedDescription(isAr)
+                                  : (isAr
+                                      ? 'حالة ممتازة جداً، استعمال خفيف، جاهز للمعاينة والتسليم الفوري في الكويت. تواصل عبر الواتساب أو الاتصال للمزيد من التفاصيل.'
+                                      : 'Excellent condition, light use, ready for inspection and delivery in Kuwait. Contact via WhatsApp or phone for details.'),
                               style: const TextStyle(
                                 fontSize: 13.5,
                                 color: Color(0xFF334155),
@@ -609,29 +632,29 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                 color: const Color(0xFFBEF264),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Center(
-                                child: Text('الغانم', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+                              child: Center(
+                                child: Text(isAr ? 'الغانم' : 'Ghanim', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       Text(
-                                        'شركة الغانم العالمية',
-                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                                        isAr ? 'شركة الغانم العالمية' : 'Al Ghanim International Co.',
+                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                                       ),
-                                      SizedBox(width: 4),
-                                      Icon(Icons.verified, color: Color(0xFF2563EB), size: 16),
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.verified, color: Color(0xFF2563EB), size: 16),
                                     ],
                                   ),
-                                  SizedBox(height: 2),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    'عضو موثق • تقييم 4.9 من 5',
-                                    style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                    isAr ? 'عضو موثق • تقييم 4.9 من 5' : 'Verified Member • Rating 4.9 of 5',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                                   ),
                                 ],
                               ),
@@ -650,14 +673,14 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: const Color(0xFFFDE68A)),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.shield_outlined, color: Color(0xFFD97706), size: 22),
-                            SizedBox(width: 10),
+                            const Icon(Icons.shield_outlined, color: Color(0xFFD97706), size: 22),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'نصيحة أمان: عاين السلعة وتأكد منها بنفسك قبل تحويل أي مبالغ مالية.',
-                                style: TextStyle(fontSize: 11, color: Color(0xFF92400E), fontWeight: FontWeight.w600),
+                                context.tr('safety_tip_notice'),
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF92400E), fontWeight: FontWeight.w600),
                               ),
                             ),
                           ],
@@ -703,7 +726,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         elevation: 0,
                       ),
                       icon: const Icon(Icons.phone, size: 18),
-                      label: const Text('اتصال بالمعلن', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      label: Text(context.tr('call_action'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       onPressed: () {
                         final phone = ad?.phone?.isNotEmpty == true
                             ? ad!.phone!
@@ -712,7 +735,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           SnackBar(
                             backgroundColor: const Color(0xFF1E293B),
                             behavior: SnackBarBehavior.floating,
-                            content: Text('الاتصال برقم المعلن: $phone'),
+                            content: Text('${isAr ? "الاتصال برقم المعلن: " : "Calling seller: "}$phone'),
                           ),
                         );
                       },
@@ -732,7 +755,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                         elevation: 0,
                       ),
                       icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                      label: const Text('محادثة واتساب', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      label: Text(context.tr('whatsapp_action'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       onPressed: () {
                         final phone = ad?.whatsapp?.isNotEmpty == true
                             ? ad!.whatsapp!
@@ -741,7 +764,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                           SnackBar(
                             backgroundColor: const Color(0xFF065F46),
                             behavior: SnackBarBehavior.floating,
-                            content: Text('فتح محادثة واتساب مع المعلن: $phone'),
+                            content: Text('${isAr ? "فتح محادثة واتساب مع المعلن: " : "Opening WhatsApp: "}$phone'),
                           ),
                         );
                       },
@@ -779,7 +802,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
             SnackBar(
               backgroundColor: const Color(0xFF1E293B),
               behavior: SnackBarBehavior.floating,
-              content: Text('تم إرسال السؤال: "$text"'),
+              content: Text(context.isArabic ? 'تم إرسال السؤال: "$text"' : 'Question sent: "$text"'),
             ),
           );
         }

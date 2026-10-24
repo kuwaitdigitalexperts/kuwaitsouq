@@ -22,25 +22,53 @@ use Illuminate\Support\Str;
 class ApiController extends Controller
 {
     /**
-     * GCC Countries list
+     * Active Countries (Kuwait strictly)
      */
     public function countries()
     {
         return response()->json([
             'status' => 'success',
-            'data' => Country::where('is_active', true)->orderBy('pos')->get(),
+            'data' => Country::where('code', 'KW')->where('is_active', true)->get(),
+        ]);
+    }
+
+    /**
+     * Kuwait Locations & Governorates (Dynamic for Admin, Mobile & Web)
+     */
+    public function locations()
+    {
+        $kuwait = Country::where('code', 'KW')->first();
+        $countryId = $kuwait ? $kuwait->id : 1;
+
+        $cities = City::where('country_id', $countryId)
+            ->where('is_active', true)
+            ->with('neighborhoods')
+            ->orderBy('pos')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $cities,
         ]);
     }
 
     /**
      * Cities in a country with neighborhoods
      */
-    public function cities(int $countryId)
+    public function cities(?int $countryId = null)
     {
-        $country = Country::findOrFail($countryId);
+        if (!$countryId) {
+            $kuwait = Country::where('code', 'KW')->first();
+            $countryId = $kuwait ? $kuwait->id : 1;
+        }
+        $country = Country::find($countryId);
+        $cities = $country
+            ? $country->cities()->where('is_active', true)->with('neighborhoods')->orderBy('pos')->get()
+            : City::where('is_active', true)->with('neighborhoods')->orderBy('pos')->get();
+
         return response()->json([
             'status' => 'success',
-            'data' => $country->cities()->where('is_active', true)->with('neighborhoods')->get(),
+            'data' => $cities,
         ]);
     }
 
@@ -108,6 +136,9 @@ class ApiController extends Controller
     {
         $query = Ad::where('status', 'active')->with(['media', 'city', 'category', 'subCategory', 'user', 'country']);
 
+        $kuwait = Country::where('code', 'KW')->first();
+        $countryId = $kuwait ? $kuwait->id : 1;
+
         if ($request->filled('country_id')) {
             $query->where('country_id', $request->country_id);
         } elseif ($request->filled('country_code')) {
@@ -115,10 +146,15 @@ class ApiController extends Controller
             $query->whereHas('country', function ($cq) use ($code) {
                 $cq->where('code', $code);
             });
+        } else {
+            // Default to Kuwait
+            $query->where('country_id', $countryId);
         }
 
-        if ($request->filled('city_id')) {
-            $query->where('city_id', $request->city_id);
+        // Support both city_id and location_id from mobile app and web
+        $cityId = $request->city_id ?: $request->location_id;
+        if ($cityId) {
+            $query->where('city_id', $cityId);
         }
         if ($request->filled('category_id')) {
             $catId = $request->category_id;
@@ -407,20 +443,13 @@ class ApiController extends Controller
             ]);
         }
 
-        // Resolve country & city
-        $countryId = $request->country_id;
-        if (!$countryId && $request->country_code) {
-            $country = Country::where('code', strtoupper($request->country_code))->first();
-            $countryId = $country?->id;
-        }
-        if (!$countryId) {
-            $country = Country::where('is_default', true)->first() ?: Country::first();
-            $countryId = $country?->id ?? 1;
-        }
+        // Resolve Kuwait country & area
+        $kuwait = Country::where('code', 'KW')->first();
+        $countryId = $kuwait ? $kuwait->id : 1;
 
         $cityId = $request->location_id ?: $request->city_id;
         if (!$cityId) {
-            $city = City::where('country_id', $countryId)->first();
+            $city = City::where('country_id', $countryId)->where('is_active', true)->orderBy('pos')->first();
             $cityId = $city?->id ?? 1;
         }
 

@@ -33,14 +33,9 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('admin.countries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.countries*') ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                    <i class="fa-solid fa-earth-americas w-4"></i>
-                    <span>Gulf Countries</span>
-                </a>
-
                 <a href="{{ route('admin.cities.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.cities*') ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
-                    <i class="fa-solid fa-city w-4"></i>
-                    <span>Cities & Areas</span>
+                    <i class="fa-solid fa-location-dot w-4"></i>
+                    <span>Kuwait Areas (مناطق الكويت)</span>
                 </a>
 
                 <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs('admin.categories*') ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }}">
