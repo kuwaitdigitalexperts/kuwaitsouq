@@ -1,0 +1,15 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/floopkok/kuwaitsouq.online/
+    - /bin/cp -R backend/app $DEPLOYPATH
+    - /bin/cp -R backend/bootstrap $DEPLOYPATH
+    - /bin/cp -R backend/config $DEPLOYPATH
+    - /bin/cp -R backend/database $DEPLOYPATH
+    - /bin/cp -R backend/public $DEPLOYPATH
+    - /bin/cp -R backend/resources $DEPLOYPATH
+    - /bin/cp -R backend/routes $DEPLOYPATH
+    - /bin/cp -R backend/.htaccess $DEPLOYPATH
+    - /bin/cp -R backend/.user.ini $DEPLOYPATH
+    - /bin/cp -R backend/artisan $DEPLOYPATH
+    - /bin/cp -R backend/composer.json $DEPLOYPATH
