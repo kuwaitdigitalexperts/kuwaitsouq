@@ -33,12 +33,9 @@
         </button>
 
         <!-- Notification Bell -->
-        <div class="relative">
-            <button type="button" class="text-white hover:text-blue-100 p-1.5 transition">
-                <i class="fa-solid fa-bell text-lg"></i>
-            </button>
-            <span class="absolute 0 top-0.5 {{ ($isRtl ?? true) ? 'left-0.5' : 'right-0.5' }} bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-blue-600">1</span>
-        </div>
+        <button type="button" class="text-white hover:text-blue-100 p-1.5 transition">
+            <i class="fa-solid fa-bell text-lg"></i>
+        </button>
     </div>
 </div>
 

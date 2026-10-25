@@ -12,7 +12,11 @@ class ChatWebController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id() ?? 2; // fallback to demo seller if not logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('info', 'يرجى تسجيل الدخول للوصول إلى المحادثات.');
+        }
+
+        $userId = Auth::id();
 
         // Find distinct chat contacts
         $messages = Message::where('sender_id', $userId)
@@ -36,27 +40,16 @@ class ChatWebController extends Controller
             }
         }
 
-        // If no contacts yet, create demo thread with Abu Fahad
-        if (empty($contacts)) {
-            $demoPartner = User::where('id', '!=', $userId)->first();
-            if ($demoPartner) {
-                $contacts[$demoPartner->id] = [
-                    'user' => $demoPartner,
-                    'last_message' => (object)[
-                        'message' => 'مرحباً، هل السكوتر ما زال متوفر؟',
-                        'created_at' => now()->subMinutes(15),
-                    ],
-                    'unread_count' => 1,
-                ];
-            }
-        }
-
         return view('web.chats.index', compact('contacts', 'userId'));
     }
 
     public function show(int $userId)
     {
-        $currentUserId = Auth::id() ?? 2;
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('info', 'يرجى تسجيل الدخول للوصول إلى المحادثة.');
+        }
+
+        $currentUserId = Auth::id();
         $partner = User::findOrFail($userId);
 
         $messages = Message::where(function ($q) use ($currentUserId, $userId) {
@@ -73,9 +66,13 @@ class ChatWebController extends Controller
 
     public function send(Request $request, int $userId)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $request->validate(['message' => 'required|string']);
 
-        $currentUserId = Auth::id() ?? 2;
+        $currentUserId = Auth::id();
         Message::create([
             'sender_id' => $currentUserId,
             'receiver_id' => $userId,

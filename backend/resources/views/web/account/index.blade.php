@@ -15,10 +15,9 @@
             <i class="fa-solid fa-gear text-lg"></i>
         </button>
 
-        <!-- Notification Bell with Badge -->
-        <button type="button" class="text-slate-700 hover:text-slate-900 relative">
+        <!-- Notification Bell -->
+        <button type="button" class="text-slate-700 hover:text-slate-900">
             <i class="fa-solid fa-bell text-lg"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">1</span>
         </button>
 
         <!-- Support Phone -->

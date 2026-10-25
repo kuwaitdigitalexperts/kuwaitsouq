@@ -16,16 +16,20 @@ class ListingWebController extends Controller
      */
     public function index(Request $request)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('info', 'يرجى تسجيل الدخول للوصول إلى إعلاناتك.');
+        }
+
         $user = Auth::user();
 
-        // Default stats if guest
-        $myListingsCount = $user ? $user->ads()->where('status', 'active')->count() : 2;
-        $totalViews = $user ? $user->ads()->sum('views_count') : 416;
-        $userRating = $user ? $user->rating : 0.0;
-        $draftCount = $user ? $user->ads()->where('status', 'draft')->count() : 0;
-        $favoriteCount = $user ? $user->favorites()->count() : 0;
-        $savedSearchesCount = $user ? $user->savedSearches()->count() : 0;
-        $jobAppsCount = $user ? $user->job_applications_count : 0;
+        // Stats for authenticated user
+        $myListingsCount = $user->ads()->where('status', 'active')->count();
+        $totalViews = $user->ads()->sum('views_count');
+        $userRating = $user->rating ?? 0.0;
+        $draftCount = $user->ads()->where('status', 'draft')->count();
+        $favoriteCount = $user->favorites()->count();
+        $savedSearchesCount = $user->savedSearches()->count();
+        $jobAppsCount = $user->job_applications_count ?? 0;
 
         // If specific subview requested e.g. "my-ads" or "favorites"
         $tab = $request->query('tab', 'overview');

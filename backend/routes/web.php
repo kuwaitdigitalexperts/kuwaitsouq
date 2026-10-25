@@ -49,22 +49,27 @@ Route::post('/ads/{id}/favorite', [AdWebController::class, 'toggleFavorite'])->n
 Route::post('/ads/{id}/price-drop', [AdWebController::class, 'togglePriceDrop'])->name('ads.price-drop');
 Route::post('/ads/{id}/quick-message', [AdWebController::class, 'sendQuickMessage'])->name('ads.quick-message');
 
-// 5. Listings Tab (Screenshot 12)
-Route::get('/listings', [ListingWebController::class, 'index'])->name('listings');
+// Authenticated Member Routes (Messaging, Listings, Add Ads)
+Route::middleware(['auth'])->group(function () {
+    // 5. Listings Tab
+    Route::get('/listings', [ListingWebController::class, 'index'])->name('listings');
 
-// 6. Account Tab (Screenshots 8, 9, 10, 11)
+    // 6. Account Actions
+    Route::post('/account/add-credit', [AccountWebController::class, 'addCredit'])->name('account.add-credit');
+    Route::post('/account/update-cv', [AccountWebController::class, 'updateCv'])->name('account.update-cv');
+
+    // 7. Chats Tab
+    Route::get('/chats', [ChatWebController::class, 'index'])->name('chats');
+    Route::get('/chats/{userId}', [ChatWebController::class, 'show'])->name('chats.show');
+    Route::post('/chats/{userId}', [ChatWebController::class, 'send'])->name('chats.send');
+
+    // 8. Add Listing Tab (Center Camera Button)
+    Route::get('/add-listing', [AdWebController::class, 'create'])->name('ads.create');
+    Route::post('/add-listing', [AdWebController::class, 'store'])->name('ads.store');
+});
+
+// Account Overview (Allows guest view or authenticated profile)
 Route::get('/account', [AccountWebController::class, 'index'])->name('account');
-Route::post('/account/add-credit', [AccountWebController::class, 'addCredit'])->name('account.add-credit');
-Route::post('/account/update-cv', [AccountWebController::class, 'updateCv'])->name('account.update-cv');
-
-// 7. Chats Tab
-Route::get('/chats', [ChatWebController::class, 'index'])->name('chats');
-Route::get('/chats/{userId}', [ChatWebController::class, 'show'])->name('chats.show');
-Route::post('/chats/{userId}', [ChatWebController::class, 'send'])->name('chats.send');
-
-// 8. Add Listing Tab (Center Camera Button)
-Route::get('/add-listing', [AdWebController::class, 'create'])->name('ads.create');
-Route::post('/add-listing', [AdWebController::class, 'store'])->name('ads.store');
 
 // 9. Admin Control Panel
 Route::prefix('admin')->name('admin.')->group(function () {

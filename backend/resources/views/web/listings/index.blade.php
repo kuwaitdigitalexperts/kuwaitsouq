@@ -11,9 +11,8 @@
 
     <div class="flex items-center gap-3">
         <!-- Notification Bell -->
-        <button type="button" class="text-slate-700 hover:text-slate-900 relative">
+        <button type="button" class="text-slate-700 hover:text-slate-900">
             <i class="fa-solid fa-bell text-lg"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">1</span>
         </button>
 
         <!-- Customer Support Phone -->

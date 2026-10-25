@@ -127,10 +127,9 @@
             <!-- Desktop Action Buttons -->
             <div class="flex items-center gap-3 flex-shrink-0">
                 <!-- Chats -->
-                <a href="{{ route('chats') }}" class="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 p-2 rounded-xl hover:bg-slate-50 transition relative" title="Chats">
+                <a href="{{ route('chats') }}" class="flex items-center gap-1.5 text-slate-700 hover:text-blue-600 p-2 rounded-xl hover:bg-slate-50 transition" title="Chats">
                     <i class="fa-solid fa-comment-dots text-lg"></i>
                     <span class="text-xs font-bold hidden lg:inline">{{ ($isRtl ?? true) ? 'المحادثات' : 'Chats' }}</span>
-                    <span class="absolute top-1 {{ ($isRtl ?? true) ? 'right-1' : 'left-1' }} bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">14</span>
                 </a>
 
                 <!-- Listings -->
@@ -246,11 +245,8 @@
             </a>
 
             <!-- Tab 2: Chats -->
-            <a href="{{ route('chats') }}" class="flex flex-col items-center justify-center flex-1 py-1 relative {{ request()->routeIs('chats*') ? 'text-blue-600 font-bold' : 'text-slate-600' }}">
-                <div class="relative">
-                    <i class="fa-solid fa-comment-dots text-lg"></i>
-                    <span class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">14</span>
-                </div>
+            <a href="{{ route('chats') }}" class="flex flex-col items-center justify-center flex-1 py-1 {{ request()->routeIs('chats*') ? 'text-blue-600 font-bold' : 'text-slate-600' }}">
+                <i class="fa-solid fa-comment-dots text-lg"></i>
                 <span class="text-[11px] font-medium mt-1">{{ ($isRtl ?? true) ? 'المحادثات' : 'Chats' }}</span>
             </a>
 
