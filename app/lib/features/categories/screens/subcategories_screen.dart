@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/categories_provider.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class SubcategoriesScreen extends StatefulWidget {
   final int parentId;
@@ -49,10 +50,7 @@ class _SubcategoriesScreenState extends State<SubcategoriesScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/categories'),
         titleSpacing: 0,
         title: Container(
           height: 40,

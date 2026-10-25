@@ -7,6 +7,7 @@ import '../../../../core/services/social_auth_service.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/widgets/kuwaitsouq_logo.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -99,10 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/login'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

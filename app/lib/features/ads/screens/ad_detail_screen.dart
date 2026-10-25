@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class AdDetailScreen extends StatefulWidget {
   final int id;
@@ -251,10 +252,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                             children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white.withOpacity(0.85),
-                                child: IconButton(
-                                  icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
+                                child: const AppBackButton(fallbackRoute: '/'),
                               ),
                               Row(
                                 children: [

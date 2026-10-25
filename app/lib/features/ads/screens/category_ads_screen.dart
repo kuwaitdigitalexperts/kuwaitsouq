@@ -10,6 +10,7 @@ import '../../../../core/providers/country_provider.dart';
 import '../../../../core/models/ad_model.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class CategoryAdsScreen extends StatefulWidget {
   final int categoryId;
@@ -201,10 +202,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/categories'),
         titleSpacing: 0,
         title: Text(
           widget.categoryName,

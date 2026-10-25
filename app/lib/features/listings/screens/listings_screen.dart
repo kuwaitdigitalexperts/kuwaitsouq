@@ -7,6 +7,7 @@ import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/auth_bottom_sheet.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../ads/widgets/ad_card.dart';
 
 class ListingsScreen extends StatefulWidget {
@@ -39,6 +40,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0.5,
+          leading: const AppBackButton(fallbackRoute: '/'),
           title: Text(
             context.tr('nav_my_ads'),
             style: const TextStyle(
@@ -108,6 +110,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
+        leading: const AppBackButton(fallbackRoute: '/'),
         title: Text(
           context.tr('nav_my_ads'),
           style: const TextStyle(

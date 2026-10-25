@@ -6,6 +6,7 @@ import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/auth_bottom_sheet.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../ads/widgets/ad_card.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -96,6 +97,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2563EB),
+        leading: const AppBackButton(color: Colors.white, fallbackRoute: '/'),
         title: Text(context.tr('categories_title')),
         elevation: 0,
         actions: [

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_back_button.dart';
 
 class BoostAdScreen extends StatefulWidget {
   final int? adId;
@@ -69,10 +70,7 @@ class _BoostAdScreenState extends State<BoostAdScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/my-ads'),
         title: Text(
           isArabic ? 'ترقية وتمييز الإعلان' : 'Boost Your Ad',
           style: const TextStyle(

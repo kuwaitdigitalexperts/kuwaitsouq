@@ -9,6 +9,7 @@ import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/country_city_picker_modal.dart';
 import '../../../../shared/widgets/auth_bottom_sheet.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -163,6 +164,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
+        leading: const AppBackButton(fallbackRoute: '/'),
         title: Text(
           context.tr('account_title'),
           style: const TextStyle(

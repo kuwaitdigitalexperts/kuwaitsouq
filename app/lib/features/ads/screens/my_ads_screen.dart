@@ -8,6 +8,7 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/models/ad_model.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 class MyAdsScreen extends StatefulWidget {
   const MyAdsScreen({super.key});
@@ -41,10 +42,7 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/'),
         title: Text(
           context.tr('my_ads'),
           style: const TextStyle(color: AppTheme.textDark, fontSize: 18, fontWeight: FontWeight.bold),

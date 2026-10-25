@@ -10,6 +10,7 @@ import '../../../../core/providers/country_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/auth_bottom_sheet.dart';
 import '../../../../shared/widgets/app_video_player.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../core/localization/app_localizations.dart';
 
 class PostAdScreen extends StatefulWidget {
@@ -304,10 +305,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/'),
         title: Text(
           isArabic ? 'أضف إعلانك' : context.tr('post_ad_title'),
           style: const TextStyle(color: AppTheme.textDark, fontSize: 18, fontWeight: FontWeight.bold),

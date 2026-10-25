@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/chat_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../core/localization/app_localizations.dart';
 
 class ConversationsScreen extends StatefulWidget {
@@ -49,10 +50,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceWhite,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/'),
         title: Text(
           isArabic ? 'المحادثات' : 'Conversations',
           style: const TextStyle(

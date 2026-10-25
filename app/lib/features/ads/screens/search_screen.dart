@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/ads_provider.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../widgets/ad_card.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -29,10 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        leading: const AppBackButton(fallbackRoute: '/'),
         titleSpacing: 0,
         title: Container(
           height: 42,

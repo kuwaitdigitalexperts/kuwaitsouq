@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../ads/widgets/ad_card.dart';
 
@@ -34,10 +35,7 @@ class _SavedScreenState extends State<SavedScreen> {
         appBar: AppBar(
           backgroundColor: AppTheme.surfaceWhite,
           elevation: 0.5,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
+          leading: const AppBackButton(fallbackRoute: '/'),
           title: Text(
             isArabic ? 'الإعلانات المحفوظة' : 'Saved Ads',
             style: const TextStyle(
