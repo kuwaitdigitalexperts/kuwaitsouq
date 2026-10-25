@@ -1,40 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_bottom_sheet.dart';
+import 'story_viewer_modal.dart';
 
 class StoriesCarousel extends StatelessWidget {
   const StoriesCarousel({super.key});
 
   static const List<Map<String, dynamic>> stories = [
     {
-      'name': 'الغانم',
-      'subtitle': 'Al Ghanim',
+      'name': 'الغانم للسيارات',
+      'subtitle': 'Al Ghanim Automotive',
       'avatar': 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=150',
+      'image': 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=900',
+      'title': 'تويوتا لاندكروزر 2024 VXR بحالة الوكالة - عداد 5,000 كم',
+      'title_en': 'Toyota Land Cruiser 2024 VXR - 5,000 km Only',
+      'price': '24,500 د.ك',
+      'time': 'منذ ساعة',
+      'time_en': '1 hour ago',
+      'ad_id': 1,
+      'phone': '+965 99001122',
       'color': Color(0xFF2563EB),
     },
     {
       'name': 'أبو فهد',
       'subtitle': 'Abu Fahad',
       'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      'image': 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900',
+      'title': 'فيلا فاخرة للبيع في صباح الأحمد البحرية صف أول على الخور',
+      'title_en': 'Luxury Seafront Villa in Sabah Al Ahmad Sea City',
+      'price': '380,000 د.ك',
+      'time': 'منذ ساعتين',
+      'time_en': '2 hours ago',
+      'ad_id': 2,
+      'phone': '+965 98765432',
       'color': Color(0xFF10B981),
     },
     {
       'name': 'كويت موتورز',
       'subtitle': 'Kuwait Motors',
       'avatar': 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=150',
+      'image': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=900',
+      'title': 'بورش 911 GT3 موديل 2023 وكالة بهبهاني سيرفيس منتظم',
+      'title_en': 'Porsche 911 GT3 2023 Behbehani Agency Kuwait',
+      'price': '62,000 د.ك',
+      'time': 'منذ 3 ساعات',
+      'time_en': '3 hours ago',
+      'ad_id': 3,
+      'phone': '+965 97771122',
       'color': Color(0xFFF59E0B),
     },
     {
       'name': 'عقارات حولي',
       'subtitle': 'Hawally Estates',
       'avatar': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=150',
+      'image': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900',
+      'title': 'شقة ديلوكس للإيجار إطلالة بحرية 3 غرف وصالة وموقفين',
+      'title_en': 'Deluxe Sea View 3-Bedroom Apartment in Hawally',
+      'price': '650 د.ك / شهر',
+      'time': 'منذ 5 ساعات',
+      'time_en': '5 hours ago',
+      'ad_id': 4,
+      'phone': '+965 94443322',
       'color': Color(0xFF8B5CF6),
     },
     {
       'name': 'سكوتر شوب',
       'subtitle': 'Scooter Shop',
       'avatar': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=150',
+      'image': 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=900',
+      'title': 'دراجة نارية رياضية ياماها R1 بحالة الوكالة فحص شامل',
+      'title_en': 'Yamaha R1 Sport Bike Excellent Condition Inspection Ready',
+      'price': '3,200 د.ك',
+      'time': 'منذ 6 ساعات',
+      'time_en': '6 hours ago',
+      'ad_id': 5,
+      'phone': '+965 92224455',
       'color': Color(0xFFEF4444),
     },
   ];
@@ -67,9 +111,21 @@ class StoriesCarousel extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(width: 14),
           itemBuilder: (context, index) {
             if (index == 0) {
-              // Add Story CTA with camera icon (Screenshot 1)
+              // Add Story CTA with camera icon
               return InkWell(
-                onTap: () => context.push('/post-ad'),
+                borderRadius: BorderRadius.circular(30),
+                onTap: () async {
+                  final auth = context.read<AuthProvider>();
+                  if (!auth.isAuthenticated) {
+                    final loggedIn = await AuthBottomSheet.show(context);
+                    if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) {
+                      return;
+                    }
+                  }
+                  if (context.mounted) {
+                    context.push('/post-ad');
+                  }
+                },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -131,9 +187,12 @@ class StoriesCarousel extends StatelessWidget {
                 : (story['subtitle'] as String? ?? story['name'] as String);
 
             return InkWell(
+              borderRadius: BorderRadius.circular(30),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(storyName)),
+                StoryViewerModal.show(
+                  context,
+                  stories: stories,
+                  initialIndex: index - 1,
                 );
               },
               child: Column(

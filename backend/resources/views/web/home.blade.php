@@ -103,11 +103,11 @@
 
         <!-- Active Seller Stories -->
         @foreach($stories as $story)
-            <div class="flex flex-col items-center flex-shrink-0 cursor-pointer">
-                <div class="w-16 h-16 rounded-full p-0.5 flex items-center justify-center relative hover:scale-105 transition
-                    {{ $story->ring_color === 'green' ? 'bg-gradient-to-tr from-emerald-500 to-teal-400' : ($story->ring_color === 'blue' ? 'bg-gradient-to-tr from-blue-600 to-cyan-400' : 'bg-gradient-to-tr from-amber-500 to-orange-400') }}">
+            <div class="flex flex-col items-center flex-shrink-0 cursor-pointer group" onclick="openStoryModal({{ $loop->index }})">
+                <div class="w-16 h-16 rounded-full p-0.5 flex items-center justify-center relative group-hover:scale-105 transition shadow-sm
+                    {{ ($story->ring_color ?? '') === 'green' ? 'bg-gradient-to-tr from-emerald-500 to-teal-400' : (($story->ring_color ?? '') === 'blue' ? 'bg-gradient-to-tr from-blue-600 to-cyan-400' : 'bg-gradient-to-tr from-amber-500 to-orange-400') }}">
                     <div class="w-full h-full rounded-full bg-white p-0.5">
-                        <img src="{{ $story->media_path }}" alt="{{ $story->user->name ?? 'Story' }}" class="w-full h-full rounded-full object-cover">
+                        <img src="{{ $story->user->avatar ?? $story->media_path }}" alt="{{ $story->user->name ?? 'Story' }}" class="w-full h-full rounded-full object-cover">
                     </div>
                 </div>
                 <span class="text-[10px] font-medium text-slate-700 mt-1 truncate max-w-[64px] text-center">
@@ -234,8 +234,175 @@
     @endif
 </div>
 
+<!-- Full-Screen Interactive Story / Status Modal -->
+<div id="storyViewerModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-0 md:p-4 transition-opacity duration-300">
+    <div class="relative w-full max-w-sm h-full md:h-[650px] bg-slate-950 md:rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between">
+        
+        <!-- Top Progress Bars -->
+        <div id="storyProgressBars" class="absolute top-3 inset-x-3 z-30 flex gap-1.5">
+            <!-- Dynamically populated segment bars -->
+        </div>
+
+        <!-- Header: Avatar, Name, Time, Close -->
+        <div class="absolute top-7 inset-x-4 z-30 flex items-center justify-between text-white">
+            <div class="flex items-center gap-2.5">
+                <img id="storySellerAvatar" src="" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow">
+                <div>
+                    <div class="flex items-center gap-1.5 leading-tight">
+                        <span id="storySellerName" class="font-bold text-sm text-white drop-shadow"></span>
+                        <i class="fa-solid fa-circle-check text-sky-400 text-xs"></i>
+                    </div>
+                    <span id="storyTimeAgo" class="text-[11px] text-white/80"></span>
+                </div>
+            </div>
+            <button type="button" onclick="closeStoryModal()" class="w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Main Media Preview -->
+        <div class="relative w-full h-full flex items-center justify-center bg-black select-none">
+            <img id="storyMediaImg" src="" alt="Story Media" class="w-full h-full object-cover">
+
+            <!-- Clickable Left/Right Navigation overlay -->
+            <div class="absolute inset-0 flex">
+                <div class="w-1/2 h-full cursor-pointer" onclick="prevStory()"></div>
+                <div class="w-1/2 h-full cursor-pointer" onclick="nextStory()"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Overlay: Caption, Price, View Ad Button -->
+        <div class="absolute bottom-4 inset-x-4 z-30 p-3.5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/20 text-white space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+                <span id="storyPrice" class="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-xs font-bold shadow"></span>
+            </div>
+            <p id="storyCaption" class="text-xs font-bold text-white line-clamp-2 leading-relaxed drop-shadow"></p>
+            <div class="flex items-center gap-2 pt-1">
+                <a id="storyAdLink" href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow">
+                    <span>{{ ($isRtl ?? true) ? 'عرض الإعلان' : 'View Ad' }}</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+                <button type="button" onclick="navigator.share ? navigator.share({title: 'Story', url: window.location.href}) : alert('Link copied!')" class="p-2 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs transition">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+    const storiesData = @json($stories);
+    let currentStoryIdx = 0;
+    let storyProgressInterval = null;
+    const STORY_DURATION = 5000;
+
+    function openStoryModal(index) {
+        if (!storiesData || storiesData.length === 0) return;
+        currentStoryIdx = index;
+        const modal = document.getElementById('storyViewerModal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        renderStory();
+    }
+
+    function closeStoryModal() {
+        clearInterval(storyProgressInterval);
+        const modal = document.getElementById('storyViewerModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function renderStory() {
+        clearInterval(storyProgressInterval);
+
+        const story = storiesData[currentStoryIdx];
+        if (!story) {
+            closeStoryModal();
+            return;
+        }
+
+        // Render Progress Bars
+        const progressContainer = document.getElementById('storyProgressBars');
+        progressContainer.innerHTML = '';
+        storiesData.forEach((s, idx) => {
+            const barWrap = document.createElement('div');
+            barWrap.className = 'flex-1 h-1 bg-white/30 rounded-full overflow-hidden';
+            const barInner = document.createElement('div');
+            barInner.className = 'h-full bg-white transition-all';
+            if (idx < currentStoryIdx) {
+                barInner.style.width = '100%';
+            } else if (idx === currentStoryIdx) {
+                barInner.style.width = '0%';
+                barInner.id = 'activeProgressBar';
+            } else {
+                barInner.style.width = '0%';
+            }
+            barWrap.appendChild(barInner);
+            progressContainer.appendChild(barWrap);
+        });
+
+        // Populate details
+        document.getElementById('storySellerAvatar').src = story.user?.avatar || story.media_path;
+        document.getElementById('storySellerName').textContent = story.user?.name || 'Seller';
+        document.getElementById('storyTimeAgo').textContent = story.time_ago || 'منذ قليل';
+        document.getElementById('storyMediaImg').src = story.media_path;
+        document.getElementById('storyCaption').textContent = story.caption || '';
+        
+        const priceEl = document.getElementById('storyPrice');
+        if (story.price) {
+            priceEl.textContent = story.price;
+            priceEl.classList.remove('hidden');
+        } else {
+            priceEl.classList.add('hidden');
+        }
+
+        const adId = story.ad_id || (story.ad?.id ?? 1);
+        document.getElementById('storyAdLink').href = `/ads/${adId}`;
+
+        // Animate active progress bar
+        let startTime = Date.now();
+        storyProgressInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const pct = Math.min(100, (elapsed / STORY_DURATION) * 100);
+            const activeBar = document.getElementById('activeProgressBar');
+            if (activeBar) {
+                activeBar.style.width = `${pct}%`;
+            }
+            if (elapsed >= STORY_DURATION) {
+                clearInterval(storyProgressInterval);
+                nextStory();
+            }
+        }, 50);
+    }
+
+    function nextStory() {
+        if (currentStoryIdx < storiesData.length - 1) {
+            currentStoryIdx++;
+            renderStory();
+        } else {
+            closeStoryModal();
+        }
+    }
+
+    function prevStory() {
+        if (currentStoryIdx > 0) {
+            currentStoryIdx--;
+            renderStory();
+        } else {
+            renderStory();
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('storyViewerModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            if (e.key === 'Escape') closeStoryModal();
+            if (e.key === 'ArrowRight') nextStory();
+            if (e.key === 'ArrowLeft') prevStory();
+        }
+    });
+
     function toggleFavorite(adId, btn) {
         fetch(`/ads/${adId}/favorite`, {
             method: 'POST',
