@@ -83,11 +83,6 @@
                 <span>👤 {{ ($isRtl ?? true) ? 'مستخدم قياسي: أبو فهد' : 'User: Abu Fahad' }}</span>
                 <span class="text-[10px] text-blue-600 font-bold">&rarr;</span>
             </a>
-
-            <a href="{{ route('demo.login', 'admin') }}" class="w-full bg-white hover:bg-blue-50 border border-blue-300 text-blue-900 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-between transition shadow-2xs">
-                <span>🛡️ {{ ($isRtl ?? true) ? 'لوحة تحكم المسؤول (الأدمن)' : 'KuwaitSouq Admin' }}</span>
-                <span class="text-[10px] text-blue-600 font-bold">&rarr;</span>
-            </a>
         </div>
     </div>
 

@@ -81,25 +81,21 @@
                 </div>
             </div>
 
-            <!-- Role / Quick Demo Switcher -->
-            <div class="flex items-center gap-2">
-                <span class="text-slate-400 hidden sm:inline">Role:</span>
-                <span class="px-2 py-0.5 rounded font-semibold text-[11px] {{ auth()->check() ? (auth()->user()->is_admin ? 'bg-purple-900 text-purple-200' : 'bg-emerald-900 text-emerald-200') : 'bg-slate-800 text-slate-300' }}">
-                    @if(auth()->check())
-                        {{ auth()->user()->name }}
-                    @else
-                        Guest
-                    @endif
-                </span>
-
-                <div class="flex items-center gap-1 text-[11px]">
-                    <a href="{{ route('demo.login', 'guest') }}" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Guest</a>
-                    <a href="{{ route('demo.login', 'alghanim') }}" class="px-1.5 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 font-medium">Al Ghanim</a>
-                    <a href="{{ route('demo.login', 'admin') }}" class="px-1.5 py-0.5 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 font-medium">Admin</a>
-                    @if(auth()->check() && auth()->user()->is_admin)
-                        <a href="{{ route('admin.dashboard') }}" class="px-2 py-0.5 rounded bg-red-600 hover:bg-red-500 text-white font-bold">Admin Panel</a>
-                    @endif
-                </div>
+            <!-- User Status / Auth Links (No Admin buttons visible to users) -->
+            <div class="flex items-center gap-2.5 text-[11px]">
+                @if(auth()->check())
+                    <span class="text-slate-300 font-medium">{{ auth()->user()->name }}</span>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-rose-400 hover:text-rose-300 font-medium transition">
+                            {{ ($isRtl ?? true) ? 'خروج' : 'Logout' }}
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="text-blue-400 hover:text-blue-300 font-medium transition">
+                        {{ ($isRtl ?? true) ? 'تسجيل الدخول' : 'Sign In' }}
+                    </a>
+                @endif
             </div>
         </div>
     </header>

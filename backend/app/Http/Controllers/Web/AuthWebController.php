@@ -128,8 +128,6 @@ class AuthWebController extends Controller
         } elseif ($role === 'fahad' || $role === 'user') {
             $user = User::where('name', 'Abu Fahad')->first()
                 ?? User::where('is_admin', false)->first();
-        } elseif ($role === 'admin') {
-            $user = User::where('is_admin', true)->first();
         }
 
         if ($user) {
