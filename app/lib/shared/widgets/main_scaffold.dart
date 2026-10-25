@@ -17,10 +17,10 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
-  static const _routes = ['/', '/categories', '/post-ad', '/listings', '/account'];
+  static const _routes = ['/', '/messages', '/post-ad', '/listings', '/account'];
 
   void _onTabTapped(int index) async {
-    // If user is a guest, intercept tabs: Categories (1), Post Ad (2), Listings (3), Profile (4)
+    // If user is a guest, intercept tabs: Chat (1), Post Ad (2), Listings (3), Profile (4)
     if (index > 0) {
       final auth = context.read<AuthProvider>();
       if (!auth.isAuthenticated) {
@@ -43,7 +43,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     final location = GoRouterState.of(context).matchedLocation;
     if (location == '/') {
       _currentIndex = 0;
-    } else if (location.startsWith('/categories')) {
+    } else if (location.startsWith('/messages') || location.startsWith('/chat')) {
       _currentIndex = 1;
     } else if (location == '/post-ad') {
       _currentIndex = 2;
@@ -51,6 +51,8 @@ class _MainScaffoldState extends State<MainScaffold> {
       _currentIndex = 3;
     } else if (location == '/account' || location == '/profile') {
       _currentIndex = 4;
+    } else {
+      _currentIndex = -1;
     }
 
     return Scaffold(
@@ -62,7 +64,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           border: const Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1.0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -75,7 +77,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(0, Icons.home_outlined, Icons.home, context.tr('nav_home')),
-                _buildNavItem(1, Icons.grid_view_outlined, Icons.grid_view, context.tr('nav_categories')),
+                _buildNavItem(1, Icons.chat_bubble_outline, Icons.chat_bubble, context.tr('nav_chat')),
                 _buildPostAdNavItem(context),
                 _buildNavItem(3, Icons.article_outlined, Icons.article, context.tr('nav_my_ads')),
                 _buildNavItem(4, Icons.person_outline, Icons.person, context.tr('nav_account')),
@@ -140,7 +142,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2563EB).withOpacity(0.35),
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -183,14 +185,9 @@ class _MainScaffoldState extends State<MainScaffold> {
             ListTile(
               leading: const Icon(Icons.grid_view, color: Color(0xFF0D9488)),
               title: Text(context.tr('categories_title')),
-              onTap: () async {
+              onTap: () {
                 Navigator.pop(context);
-                final auth = context.read<AuthProvider>();
-                if (!auth.isAuthenticated) {
-                  final loggedIn = await AuthBottomSheet.show(context);
-                  if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
-                }
-                if (context.mounted) context.go('/categories');
+                context.push('/categories');
               },
             ),
             ListTile(
@@ -204,9 +201,14 @@ class _MainScaffoldState extends State<MainScaffold> {
             ListTile(
               leading: const Icon(Icons.chat_bubble_outline, color: Color(0xFF2563EB)),
               title: Text(context.tr('nav_chat')),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                context.push('/messages');
+                final auth = context.read<AuthProvider>();
+                if (!auth.isAuthenticated) {
+                  final loggedIn = await AuthBottomSheet.show(context);
+                  if (loggedIn != true && context.mounted && !context.read<AuthProvider>().isAuthenticated) return;
+                }
+                if (context.mounted) context.go('/messages');
               },
             ),
             ListTile(

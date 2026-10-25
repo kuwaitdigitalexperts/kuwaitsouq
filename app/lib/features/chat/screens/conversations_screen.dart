@@ -5,6 +5,7 @@ import '../../../../core/providers/chat_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/auth_bottom_sheet.dart';
 import '../../../../core/localization/app_localizations.dart';
 
 class ConversationsScreen extends StatefulWidget {
@@ -19,15 +20,89 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatProvider>().fetchMessages();
+      final auth = context.read<AuthProvider>();
+      if (!auth.isAuthenticated) {
+        AuthBottomSheet.show(context);
+      } else {
+        context.read<ChatProvider>().fetchMessages();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final isArabic = context.isArabic;
-    final chat = context.watch<ChatProvider>();
     final auth = context.watch<AuthProvider>();
+
+    if (!auth.isAuthenticated) {
+      return Scaffold(
+        backgroundColor: AppTheme.bgLight,
+        appBar: AppBar(
+          backgroundColor: AppTheme.surfaceWhite,
+          elevation: 0.5,
+          leading: const AppBackButton(fallbackRoute: '/'),
+          title: Text(
+            isArabic ? 'الرسائل والمحادثات' : 'Chat & Messages',
+            style: const TextStyle(
+              color: AppTheme.textDark,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.chat_bubble_outline, size: 40, color: Color(0xFF2563EB)),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  isArabic ? 'سجل دخولك لعرض محادثاتك' : 'Sign in to view your conversations',
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isArabic
+                      ? 'تواصل مع المعلنين والمشترين ومتابعة رسائلك بعد تسجيل الدخول'
+                      : 'Chat with buyers and sellers and follow up on inquiries after logging in',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 220,
+                  height: 46,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2563EB),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () => AuthBottomSheet.show(context),
+                    child: Text(
+                      isArabic ? 'تسجيل الدخول / حساب جديد' : 'Sign In / Register',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final chat = context.watch<ChatProvider>();
     final myId = int.tryParse(auth.user?['id']?.toString() ?? '');
 
     // Group messages into distinct conversations
