@@ -409,13 +409,9 @@ class _StoryViewerModalState extends State<StoryViewerModal>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          IconButton.filled(
-                            style: IconButton.filled(
-                              backgroundColor: const Color(0xFF10B981),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.all(11),
-                            ),
-                            onPressed: () {
+                          InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
                               final phone = story['phone'] as String? ?? '+965 99001122';
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -425,23 +421,33 @@ class _StoryViewerModalState extends State<StoryViewerModal>
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.phone, size: 20),
+                            child: Container(
+                              padding: const EdgeInsets.all(11),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.phone, color: Colors.white, size: 20),
+                            ),
                           ),
                           const SizedBox(width: 6),
-                          IconButton.filled(
-                            style: IconButton.filled(
-                              backgroundColor: const Color(0xFF059669),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.all(11),
-                            ),
-                            onPressed: () {
+                          InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
                               Navigator.of(context).pop();
                               context.push(
                                 '/chat/$adId',
                                 extra: {'userName': sellerName, 'adId': adId},
                               );
                             },
-                            icon: const Icon(Icons.chat_bubble_outline, size: 20),
+                            child: Container(
+                              padding: const EdgeInsets.all(11),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF059669),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 20),
+                            ),
                           ),
                         ],
                       ),
