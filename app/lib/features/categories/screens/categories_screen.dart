@@ -185,9 +185,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       color: AppTheme.textDark,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   GridView.builder(
                     shrinkWrap: true,
+                    padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _subcategories.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
