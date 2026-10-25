@@ -25,6 +25,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _priceCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _whatsappCtrl = TextEditingController();
 
   String _condition = 'used';
   String _currency = 'KWD';
@@ -50,8 +52,27 @@ class _PostAdScreenState extends State<PostAdScreen> {
             } else {
               context.go('/');
             }
+          } else if (mounted) {
+            final refreshedAuth = context.read<AuthProvider>();
+            final p = refreshedAuth.user?['phone']?.toString();
+            if (p != null && p.isNotEmpty && _phoneCtrl.text.isEmpty) {
+              setState(() => _phoneCtrl.text = p);
+            }
+            final w = refreshedAuth.user?['whatsapp']?.toString();
+            if (w != null && w.isNotEmpty && _whatsappCtrl.text.isEmpty) {
+              setState(() => _whatsappCtrl.text = w);
+            }
           }
         });
+      } else {
+        final p = auth.user?['phone']?.toString();
+        if (p != null && p.isNotEmpty && _phoneCtrl.text.isEmpty) {
+          setState(() => _phoneCtrl.text = p);
+        }
+        final w = auth.user?['whatsapp']?.toString();
+        if (w != null && w.isNotEmpty && _whatsappCtrl.text.isEmpty) {
+          setState(() => _whatsappCtrl.text = w);
+        }
       }
       context.read<CategoriesProvider>().fetchCategories();
       context.read<CategoriesProvider>().fetchLocations();
@@ -254,6 +275,9 @@ class _PostAdScreenState extends State<PostAdScreen> {
     }
 
     final country = context.read<CountryProvider>().currentCountry;
+    final phone = _phoneCtrl.text.trim();
+    final whatsapp = _whatsappCtrl.text.trim().isNotEmpty ? _whatsappCtrl.text.trim() : phone;
+
     final ok = await context.read<AdsProvider>().postAd(
       {
         'title': _titleCtrl.text.trim(),
@@ -265,6 +289,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
         'location_id': _locationId,
         'country_id': country['id'],
         'country_code': country['code'],
+        'phone': phone,
+        'whatsapp': whatsapp,
         'is_featured': _isFeatured,
         'is_urgent': _isUrgent,
       },
@@ -717,6 +743,107 @@ class _PostAdScreenState extends State<PostAdScreen> {
               ),
               const SizedBox(height: 18),
 
+              // Contact Information (Phone & WhatsApp) - Matching Web
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceWhite,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.phone_in_talk, color: Color(0xFF10B981), size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isArabic ? 'معلومات الاتصال' : 'Contact Information',
+                          style: const TextStyle(
+                            color: AppTheme.textDark,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Phone Number Field
+                    _buildFieldLabel('${isArabic ? "رقم الهاتف" : "Phone Number"} *'),
+                    TextFormField(
+                      controller: _phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                      style: const TextStyle(color: AppTheme.textDark, fontSize: 14, fontWeight: FontWeight.w600),
+                      decoration: _buildInputDecoration(
+                        hintText: isArabic ? 'مثال: 99001122 أو +96599001122' : 'e.g. 99001122 or +96599001122',
+                      ).copyWith(
+                        prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF2563EB), size: 20),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return isArabic ? 'رقم الهاتف مطلوب لتواصل المشترين معك' : 'Phone number is required';
+                        }
+                        if (v.trim().length < 6) {
+                          return isArabic ? 'رقم الهاتف غير صالح' : 'Invalid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+
+                    // WhatsApp Number Field
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildFieldLabel(isArabic ? 'رقم الواتساب (اختياري)' : 'WhatsApp Number (Optional)'),
+                        InkWell(
+                          onTap: () {
+                            if (_phoneCtrl.text.isNotEmpty) {
+                              setState(() => _whatsappCtrl.text = _phoneCtrl.text);
+                            }
+                          },
+                          child: Text(
+                            isArabic ? 'استخدام نفس رقم الهاتف' : 'Use same as phone',
+                            style: const TextStyle(
+                              color: Color(0xFF2563EB),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _whatsappCtrl,
+                      keyboardType: TextInputType.phone,
+                      style: const TextStyle(color: AppTheme.textDark, fontSize: 14, fontWeight: FontWeight.w600),
+                      decoration: _buildInputDecoration(
+                        hintText: isArabic ? 'اتركه فارغاً لاستخدام نفس رقم الهاتف' : 'Leave empty to use same phone number',
+                      ).copyWith(
+                        prefixIcon: const Icon(Icons.chat_outlined, color: Color(0xFF10B981), size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+
               // Urgent & Featured Options
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -818,6 +945,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _priceCtrl.dispose();
+    _phoneCtrl.dispose();
+    _whatsappCtrl.dispose();
     super.dispose();
   }
 }

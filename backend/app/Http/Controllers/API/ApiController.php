@@ -516,6 +516,13 @@ class ApiController extends Controller
             ]);
         }
 
+        if ($user && empty($user->phone) && $request->filled('phone')) {
+            $user->update([
+                'phone' => $request->phone,
+                'whatsapp' => $request->whatsapp ?: $request->phone,
+            ]);
+        }
+
         // Resolve Kuwait country & area
         $kuwait = Country::where('code', 'KW')->first();
         $countryId = $kuwait ? $kuwait->id : 1;
