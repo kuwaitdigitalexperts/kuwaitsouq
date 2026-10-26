@@ -6,6 +6,7 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/providers/ads_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AdDetailScreen extends StatefulWidget {
   final int id;
@@ -312,7 +313,7 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                                   const Icon(Icons.camera_alt, color: Colors.white, size: 14),
                                   const SizedBox(width: 4),
                                   Text(
-                                    '${images.length > 0 ? images.length : 1}',
+                                    '${images.isNotEmpty ? images.length : 1}',
                                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                 ],
@@ -725,17 +726,27 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                       ),
                       icon: const Icon(Icons.phone, size: 18),
                       label: Text(context.tr('call_action'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                      onPressed: () {
+                      onPressed: () async {
                         final phone = ad?.phone?.isNotEmpty == true
                             ? ad!.phone!
                             : (ad?.whatsapp?.isNotEmpty == true ? ad!.whatsapp! : '+965 99001122');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: const Color(0xFF1E293B),
-                            behavior: SnackBarBehavior.floating,
-                            content: Text('${isAr ? "الاتصال برقم المعلن: " : "Calling seller: "}$phone'),
-                          ),
-                        );
+                        final clean = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+                        final uri = Uri.parse('tel:$clean');
+                        try {
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                            return;
+                          }
+                        } catch (_) {}
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: const Color(0xFF1E293B),
+                              behavior: SnackBarBehavior.floating,
+                              content: Text('${isAr ? "الاتصال برقم المعلن: " : "Calling seller: "}$phone'),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),
@@ -754,17 +765,27 @@ class _AdDetailScreenState extends State<AdDetailScreen> {
                       ),
                       icon: const Icon(Icons.chat_bubble_outline, size: 18),
                       label: Text(context.tr('whatsapp_action'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                      onPressed: () {
+                      onPressed: () async {
                         final phone = ad?.whatsapp?.isNotEmpty == true
                             ? ad!.whatsapp!
                             : (ad?.phone?.isNotEmpty == true ? ad!.phone! : '+965 99001122');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: const Color(0xFF065F46),
-                            behavior: SnackBarBehavior.floating,
-                            content: Text('${isAr ? "فتح محادثة واتساب مع المعلن: " : "Opening WhatsApp: "}$phone'),
-                          ),
-                        );
+                        final clean = phone.replaceAll(RegExp(r'[^0-9]'), '');
+                        final uri = Uri.parse('https://wa.me/$clean');
+                        try {
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            return;
+                          }
+                        } catch (_) {}
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: const Color(0xFF065F46),
+                              behavior: SnackBarBehavior.floating,
+                              content: Text('${isAr ? "فتح محادثة واتساب مع المعلن: " : "Opening WhatsApp: "}$phone'),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
   static const String liveBaseUrl = 'https://kuwaitsouq.online/api/v1';
@@ -35,7 +36,10 @@ class ApiClient {
     return '${baseUrl.replaceAll('/api/v1', '')}/storage';
   }
 
-  static const _storage = FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage(
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    aOptions: AndroidOptions(),
+  );
   late final Dio _dio;
 
   ApiClient() {
@@ -48,7 +52,7 @@ class ApiClient {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storage.read(key: 'auth_token');
+        final token = await _safeRead('auth_token');
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -354,16 +358,60 @@ class ApiClient {
     return res.data is Map<String, dynamic> ? Map<String, dynamic>.from(res.data) : {};
   }
 
+  static Future<void> _safeWrite(String key, String value) async {
+    try {
+      await _storage.write(key: key, value: value);
+    } catch (e) {
+      debugPrint('⚠️ [ApiClient] SecureStorage write error: $e');
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, value);
+    } catch (prefsErr) {
+      debugPrint('⚠️ [ApiClient] SharedPreferences write error: $prefsErr');
+    }
+  }
+
+  static Future<String?> _safeRead(String key) async {
+    try {
+      final val = await _storage.read(key: key);
+      if (val != null && val.isNotEmpty) return val;
+    } catch (e) {
+      debugPrint('⚠️ [ApiClient] SecureStorage read error: $e');
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(key);
+    } catch (prefsErr) {
+      debugPrint('⚠️ [ApiClient] SharedPreferences read error: $prefsErr');
+    }
+    return null;
+  }
+
+  static Future<void> _safeDelete(String key) async {
+    try {
+      await _storage.delete(key: key);
+    } catch (e) {
+      debugPrint('⚠️ [ApiClient] SecureStorage delete error: $e');
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(key);
+    } catch (prefsErr) {
+      debugPrint('⚠️ [ApiClient] SharedPreferences delete error: $prefsErr');
+    }
+  }
+
   static Future<void> saveToken(String token) async {
-    await _storage.write(key: 'auth_token', value: token);
+    await _safeWrite('auth_token', token);
   }
 
   static Future<void> saveUser(Map<String, dynamic> user) async {
-    await _storage.write(key: 'auth_user', value: jsonEncode(user));
+    await _safeWrite('auth_user', jsonEncode(user));
   }
 
   static Future<Map<String, dynamic>?> getUser() async {
-    final str = await _storage.read(key: 'auth_user');
+    final str = await _safeRead('auth_user');
     if (str != null && str.isNotEmpty) {
       try {
         return jsonDecode(str) as Map<String, dynamic>;
@@ -373,8 +421,8 @@ class ApiClient {
   }
 
   static Future<void> clearAuth() async {
-    await _storage.delete(key: 'auth_token');
-    await _storage.delete(key: 'auth_user');
+    await _safeDelete('auth_token');
+    await _safeDelete('auth_user');
   }
 
   static Future<void> clearToken() async {
@@ -382,6 +430,6 @@ class ApiClient {
   }
 
   static Future<String?> getToken() async {
-    return await _storage.read(key: 'auth_token');
+    return await _safeRead('auth_token');
   }
 }

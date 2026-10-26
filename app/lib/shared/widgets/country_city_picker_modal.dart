@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/providers/country_provider.dart';
-import '../theme/app_theme.dart';
 
 class CountryCityPickerModal extends StatefulWidget {
   final Map<String, dynamic>? initialCountry;

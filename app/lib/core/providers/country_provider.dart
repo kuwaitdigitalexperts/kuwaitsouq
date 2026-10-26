@@ -8,7 +8,6 @@ class CountryProvider extends ChangeNotifier {
   static const String _prefCityIdKey = 'kuwaitsouq_selected_city_id';
   static const String _prefCityKey = 'kuwaitsouq_selected_city';
   static const String _prefCityArKey = 'kuwaitsouq_selected_city_ar';
-  static const String _prefIsSavedKey = 'kuwaitsouq_country_is_saved';
 
   // Strictly Kuwait
   final Map<String, dynamic> _currentCountry = AppConstants.kuwaitCountry;

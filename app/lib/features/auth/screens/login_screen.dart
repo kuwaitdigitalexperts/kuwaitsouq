@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _otpController = TextEditingController();
 
-  bool _isPasswordMode = true; // Email & Password default; Phone Auth commented out for now
+  final bool _isPasswordMode = true; // Email & Password default; Phone Auth commented out for now
   bool _isOtpSent = false;
   bool _obscurePassword = true;
   bool _isLocalLoading = false;

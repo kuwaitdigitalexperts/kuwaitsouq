@@ -33,6 +33,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>1019199889747-3ldj67t439gk5lpmjuep70teletqpvb0.apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>1019199889747-dbtc9idp7g93j16dnk1u1r8de87nnl1q.apps.googleusercontent.com</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

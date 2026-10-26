@@ -52,7 +52,6 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
 
   // Sorting
   String _sortBy = 'newest';
-  String? _sortLabel;
 
   String? get _localizedSelectedLocationName {
     if (_selectedLocationId == null) return null;
@@ -178,7 +177,6 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
       _priceLabel = null;
       _selectedCondition = null;
       _sortBy = 'newest';
-      _sortLabel = 'Newest';
     });
     _applyFilters();
   }
@@ -1244,7 +1242,7 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                   title: Text(c['label'] as String, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
                   trailing: isSelected ? const Icon(Icons.check, color: AppTheme.primaryGreen) : null,
                   onTap: () {
-                    setState(() => _selectedCondition = c['val'] as String?);
+                    setState(() => _selectedCondition = c['val']);
                     Navigator.pop(context);
                     _applyFilters();
                   },
@@ -1298,7 +1296,6 @@ class _CategoryAdsScreenState extends State<CategoryAdsScreen> {
                   onTap: () {
                     setState(() {
                       _sortBy = opt['key'] as String;
-                      _sortLabel = opt['short'] as String;
                     });
                     Navigator.pop(context);
                     _applyFilters();
