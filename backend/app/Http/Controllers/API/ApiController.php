@@ -247,7 +247,7 @@ class ApiController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
         ]);
@@ -255,12 +255,16 @@ class ApiController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
+            'phone' => $request->phone ?: ('965' . mt_rand(1000000, 9999999)),
             'phone_code' => $request->phone_code ?: '+965',
             'password' => Hash::make($request->password),
-            'member_type' => 'Standard Member',
+            'is_verified' => true,
+            'member_type' => 'Free Member',
+            'member_id_number' => (string) mt_rand(10000000, 99999999),
             'member_since' => now(),
             'live_listings_limit' => 20,
+            'listing_credits' => 5,
+            'vas_credits' => 1,
         ]);
 
         $token = $user->createToken('mobile_app')->plainTextToken;
@@ -299,41 +303,6 @@ class ApiController extends Controller
         }
 
         return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
-    }
-
-    /**
-     * User registration with Email and Password
-     */
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => '965' . mt_rand(1000000, 9999999),
-            'phone_code' => '+965',
-            'password' => Hash::make($request->password),
-            'is_verified' => true,
-            'member_type' => 'Free Member',
-            'member_id_number' => (string) mt_rand(10000000, 99999999),
-            'member_since' => now(),
-            'live_listings_limit' => 20,
-            'listing_credits' => 5,
-            'vas_credits' => 1,
-        ]);
-
-        $token = $user->createToken('mobile_app')->plainTextToken;
-
-        return response()->json([
-            'status' => 'success',
-            'token' => $token,
-            'user' => $user,
-        ]);
     }
 
     /**
