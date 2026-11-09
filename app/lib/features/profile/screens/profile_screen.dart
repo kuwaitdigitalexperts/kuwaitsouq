@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/localization_provider.dart';
@@ -614,7 +615,12 @@ class ProfileScreen extends StatelessWidget {
                       style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF94A3B8)),
-                    onTap: () {},
+                    onTap: () async {
+                      final url = Uri.parse('https://kuwaitsouq.online/privacy-policy');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
                   ),
                   if (auth.isAuthenticated) ...[
                     const Divider(height: 1, indent: 56),

@@ -43,6 +43,9 @@ Route::post('/logout', [AuthWebController::class, 'logout'])->name('logout');
 
 // 4. Main App & Web Portal
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/privacy-policy', function () {
+    return view('web.privacy');
+})->name('privacy.policy');
 Route::get('/category/{slug}', [CategoryWebController::class, 'show'])->name('category.show');
 Route::get('/ads/{id}', [AdWebController::class, 'show'])->name('ads.show');
 Route::post('/ads/{id}/favorite', [AdWebController::class, 'toggleFavorite'])->name('ads.favorite');
